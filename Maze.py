@@ -1,5 +1,5 @@
 from itertools import count
-import pygame
+import pygame as pg
 import numpy as np
 from queue import PriorityQueue
 import queue
@@ -22,12 +22,20 @@ five = (246, 137, 137)
 six = (255, 0, 0)
 seven = (0, 255, 0)
 
-pygame.init()
+pg.init()
 
-size = (706, 706)
-screen = pygame.display.set_mode(size)
+#set size of each screen, screen 1 is the main screen, screen 2 is the button screen
+size = (1412, 706)
+screen1_size = (size[0] // 2, size[1])
+screen2_size = (size[0] // 2, size[1])
+screen1 = pg.display.set_mode(screen1_size)
+screen2 = pg.display.set_mode(screen2_size)
+screen = pg.display.set_mode(size)
 
-pygame.display.set_caption("MAZE")
+width, height = screen1.get_size()
+mouse_pos = pg.mouse.get_pos()
+
+pg.display.set_caption("MAZE")
 
 width = 20
 height = 20
@@ -38,7 +46,7 @@ gobalStartPoint = None
 gobalEndPoint = None
 
 done = False
-clock = pygame.time.Clock()
+clock = pg.time.Clock()
 found = False
 neighbour=[]
 
@@ -304,10 +312,10 @@ def simulate_dijkstra_process(came_from, start, end, visited):
 
 
 def print_grid(grid):
-    global screen
+    global screen1
     global width, height, margin
 
-    screen.fill(two)
+    screen1.fill(two)
 
     for row in range(33):
         for column in range(33):
@@ -326,9 +334,9 @@ def print_grid(grid):
             else:
                 color = four
 
-            pygame.draw.rect(screen, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
+            pg.draw.rect(screen1, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
 
-    pygame.display.flip()
+    pg.display.flip()
 
 
 
@@ -412,64 +420,16 @@ def a_star():
                     open_set.put((f_score[nei[0]*len(grid[0]) +nei[1]], count, nei))
                     open_set_his.add(nei)
                     # grid[nei[0]][nei[1]] = 5
-                    # pygame.display.update()
+                    # pg.display.update()
                     # time.sleep(0.01)
     
         # if current != start:
         #     grid[current[0]][current[1]] = 6
-        #     pygame.display.update()
+        #     pg.display.update()
         #     time.sleep(0.01)
         
 
     return False
-
-
-
-
-
-# def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
-#     global grid
-
-#     def is_valid(x, y):
-#         return 0 <= x < 33 and 0 <= y < 33
-
-#     def get_neighbours(x, y):
-#         neighbours = []
-#         for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
-#             new_x, new_y = x + dx, y + dy
-#             if is_valid(new_x, new_y):
-#                 neighbours.append((new_x, new_y))
-#         return neighbours
-
-#     def create_maze(x, y):
-#         grid[y][x] = 0  # Mark the cell as visited
-#         neighbours = get_neighbours(x, y)
-#         random.shuffle(neighbours)
-
-#         for next_x, next_y in neighbours:
-#             if grid[next_y][next_x] == 1:
-#                 grid[(y + next_y) // 2][(x + next_x) // 2] = 0
-#                 create_maze(next_x, next_y)
-
-#     # Initialize the maze with walls (1s)
-#     grid = [[1 for _ in range(33)] for _ in range(33)]
-
-#     # Make sure the start and end points are valid
-#     start_x, start_y = max(1, min(start_x, 31)), max(1, min(start_y, 31))
-#     end_x, end_y = max(1, min(end_x, 31)), max(1, min(end_y, 31))
-
-#     # Generate the maze
-#     create_maze(start_x, start_y)
-
-#     # Mark the start and end points
-#     grid[start_x][start_y] = 2
-#     grid[end_x][end_y] = 3
-
-
-    # Ensure that the maze is solvable (you can add a solvability check here)
-
-# ...
-
 
 def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     global grid
@@ -506,18 +466,6 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     # Generate the maze
     create_maze(start_x, start_y)
 
-    
-
-    # Ensure the maze is solvable by connecting all visited cells
-    # for y in range(1, 32, 2):
-    #     for x in range(1, 32, 2):
-    #         if grid[y][x] == 0:
-    #             continue
-    #         for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-    #             new_x, new_y = x + dx, y + dy
-    #             if is_valid(new_x, new_y) and grid[new_y][new_x] == 0:
-    #                 grid[y][x] = 0
-    #                 break
     # Mark the start and end points
 
     grid[start_x][start_y] = 2
@@ -529,54 +477,59 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     return grid
 
 
-
-
-
-
-      
-
-
-
-
-
-
+def get_font(size):
+    return pg.font.Font("images/Debrosee-ALPnL.ttf", size)
 
 while not done:
     gobalStartPoint 
     gobalEndPoint 
+    
+    '''MENU_MOUSE_POS = pg.mouse.get_pos()
+    
+    RANDOM_BUTTON = Button(image = pg.image.load("images/Play Rect.png"), pos=(800, 270), 
+                           text_input="RANDOM", font=get_font(150), base_color="#d7fcd4", hovering_color="#6699EE")
+    
+    # Only call changeColor() on the button that the mouse is hovering over
+    for button in [RANDOM_BUTTON]:
+        if button.rect.collidepoint(MENU_MOUSE_POS):
+            button.changeColor(MENU_MOUSE_POS)
 
-    for event in pygame.event.get(): 
-        if event.type == pygame.QUIT:
+    for button in [RANDOM_BUTTON]:
+        button.update(screen2)'''
+
+    for event in pg.event.get(): 
+        if event.type == pg.QUIT:
             done = True
-        elif event.type == pygame.KEYDOWN:
-             if event.key == pygame.K_ESCAPE:
-                    print("Exit")
-                    pygame.quit()
-             if event.key == pygame.K_s:
-                 print("Saving Maze")
-                 savegrid()
-             if event.key == pygame.K_l:
-                 print("Loading Maze")
-                 loadgrid(0)
-             if event.key == pygame.K_f:
-                 print("Filling Maze")
-                 grid = [[1 for x in range(33)] for y in range(33)]
-             if event.key == pygame.K_1:
-                 print("Loading Maze 1")
-                 loadgrid(1)
-             if event.key == pygame.K_2:
-                 print("Loading Maze 2")
-                 loadgrid(2)
-             if event.key == pygame.K_3:
-                 print("Loading Maze 3")
-                 loadgrid(3)
-             if event.key == pygame.K_4:
-                 print("Loading Maze 4")
-                 loadgrid(4)
-             if event.key == pygame.K_5:
-                 print("Loading Maze 5")
-                 loadgrid(5)
-             if event.key == pygame.K_RETURN:
+            
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_ESCAPE:
+                print("Exit")
+                pg.quit()
+            if event.key == pg.K_s:
+                print("Saving Maze")
+                savegrid()
+            if event.key == pg.K_l:
+                print("Loading Maze")
+                loadgrid(0)
+            if event.key == pg.K_f:
+                print("Filling Maze")
+                grid = [[1 for x in range(33)] for y in range(33)]
+            if event.key == pg.K_1:
+                print("Loading Maze 1")
+                loadgrid(1)
+            if event.key == pg.K_2:
+                print("Loading Maze 2")
+                loadgrid(2)
+            if event.key == pg.K_3:
+                print("Loading Maze 3")
+                loadgrid(3)
+            if event.key == pg.K_4:
+                print("Loading Maze 4")
+                loadgrid(4)
+            if event.key == pg.K_5:
+                print("Loading Maze 5")
+                loadgrid(5)
+            if event.key == pg.K_RETURN:
                 if((sum(x.count(2) for x in grid)) == 1):
                     print("Solving")
                     #bfs()
@@ -584,7 +537,7 @@ while not done:
                     #dfs()
                     #dfs_simulation()
                     dijkstra()
-             if event.key == pygame.K_q:
+            if event.key == pg.K_q:
                 print("Creating and loading a random maze")
                 try:
                     #generate_random_maze()
@@ -597,10 +550,10 @@ while not done:
                     print("Please choose start and end point")
 
 
-             if event.key == pygame.K_r:
-
+            if event.key == pg.K_r:
                 grid = [[0 for x in range(33)] for y in range(33)]
-        if pygame.mouse.get_pressed()[2]:
+                
+        if pg.mouse.get_pressed()[2]:
             column = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
             if((sum(x.count(2) for x in grid)) < 1 or (sum(x.count(3) for x in grid)) < 1):
@@ -628,18 +581,27 @@ while not done:
                     grid[row][column] = 0
                 if(grid[row][column] == 1):
                     grid[row][column] = 0
-        if pygame.mouse.get_pressed()[0]:
-            # if(event.button == 1):
+                    
+        if pg.mouse.get_pressed()[0]:
             column = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
-            print("left click")
-            grid[row][column] = 1
+            if row < 0 or row >= len(grid) or column < 0 or column >= len(grid[0]):
+                continue
+            else: 
+                print("left click")
+                grid[row][column] = 1
         
                 
-    pos = pygame.mouse.get_pos()
+    pos = pg.mouse.get_pos()
     x = pos[0]
     y = pos[1]
-    screen.fill(two)
+    screen1.fill(two)
+    screen2.fill(two)
+    
+    # Blit the two screens onto the main display surface
+    pg.display.get_surface().blit(screen1, (0, 0))
+    pg.display.get_surface().blit(screen2, (screen1.get_width(), 0))
+    
     for row in range(33):
         for column in range(33):
             if grid[row][column] == 1:
@@ -656,10 +618,11 @@ while not done:
                 color = seven
             else:
                 color = four
-            pygame.draw.rect(screen, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
-    pygame.display.flip()
+            pg.draw.rect(screen1, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
+    pg.display.flip()
     clock.tick(60)
-pygame.quit()
+    pg.display.update()
+pg.quit()
 
 
 
