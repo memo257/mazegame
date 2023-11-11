@@ -392,6 +392,7 @@ def create_buttons():
     button_list.append(Button(800, 400, 120, 60, "LOAD", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
     button_list.append(Button(800, 600, 120, 60, "QUIT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
     
+
     for button in button_list:
         button.draw(screen2)
 
