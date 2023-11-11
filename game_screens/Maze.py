@@ -12,6 +12,7 @@ from queue import Queue
 import heapq
 import tkinter as tk
 from Button_game import Button
+from tkinter import filedialog
 
 #colors
 one = (79, 189, 186)
@@ -27,7 +28,7 @@ Black = '#fff'
 pg.init()
 
 #set size of each screen, screen 1 is the main screen, screen 2 is the button screen
-size = (1126, 706)
+size = (1126, 729)
 screen1_size = (size[0] - 420, size[1])
 screen2_size = (size[0] - 706, size[1])
 screen1 = pg.display.set_mode(screen1_size)
@@ -383,9 +384,13 @@ def get_font(size):
     return pg.font.Font("images/Debrosee-ALPnL.ttf", size)
 
 def create_buttons():
-    button_list.append(Button(800, 100, 150, 75, "PLAY", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 300, 150, 75, "CHANGE MAP", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 500, 150, 75, "RANDOM", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 50, 120, 60, "PLAY", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 120, 120, 60, "CHANGE MAP", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 190, 120, 60, "RANDOM", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 260, 120, 60, "NEW GAME", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 330, 120, 60, "SAVE", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 400, 120, 60, "LOAD", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 600, 120, 60, "QUIT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
     
     for button in button_list:
         button.draw(screen2)
@@ -409,31 +414,36 @@ def cm_button():
 def rd_button():
     print("Creating and loading a random maze")
     try:
-        #generate_random_maze()
-        #generate_random_maze_with_user_points(0, 1, 20, 20)
         generate_solvability_maze_with_user_points(gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1])
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt",grid) # Load the generated maze
     except:
         print("Please choose start and end point")
+    
+def ng_buttom():
+    global grid
+    grid = [[0 for x in range(33)] for y in range(33)]
+    
+def save_button():
+    file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+    if file_path:
+        # Perform save operation here
+        global grid
+        np.savetxt(file_path, grid)
+        print("File saved:", file_path)
+        
+def load_button():
+    file_path = filedialog.askopenfile(defaultextension=".txt")
+    if file_path:
+        global grid
+        grid = np.genfromtxt(file_path, dtype=float, invalid_raise=False)
+        grid = np.nan_to_num(grid, nan=0.0)  # Replace NaN values with 0.0
+        grid = grid.astype(np.float64)
 
 while not done:
     gobalStartPoint 
     gobalEndPoint 
     
-    '''MENU_MOUSE_POS = pg.mouse.get_pos()
-    
-    RANDOM_BUTTON = Button(image = pg.image.load("images/Play Rect.png"), pos=(800, 270), 
-                           text_input="RANDOM", font=get_font(150), base_color="#d7fcd4", hovering_color="#6699EE")
-    
-    # Only call changeColor() on the button that the mouse is hovering over
-    for button in [RANDOM_BUTTON]:
-        if button.rect.collidepoint(MENU_MOUSE_POS):
-            button.changeColor(MENU_MOUSE_POS)
-
-    for button in [RANDOM_BUTTON]:
-        button.update(screen2)'''
-        
     pos = pg.mouse.get_pos()
     x = pos[0]
     y = pos[1]
@@ -451,7 +461,7 @@ while not done:
             done = True
             
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
+            '''if event.key == pg.K_ESCAPE:
                 print("Exit")
                 pg.quit()
             if event.key == pg.K_s:
@@ -459,25 +469,10 @@ while not done:
                 savegrid()
             if event.key == pg.K_l:
                 print("Loading Maze")
-                loadgrid(0)
+                loadgrid(0)'''
             if event.key == pg.K_f:
                 print("Filling Maze")
                 grid = [[1 for x in range(33)] for y in range(33)]
-            if event.key == pg.K_q:
-                print("Creating and loading a random maze")
-                try:
-                    #generate_random_maze()
-                    #generate_random_maze_with_user_points(0, 1, 20, 20)
-                    generate_solvability_maze_with_user_points(gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1])
-
-                    savegrid()  # Save the generated maze
-                    np.savetxt(r"./maze.txt",grid) # Load the generated maze
-                except:
-                    print("Please choose start and end point")
-
-
-            if event.key == pg.K_r:
-                grid = [[0 for x in range(33)] for y in range(33)]
         
         elif event.type == pg.MOUSEBUTTONDOWN:
             mp_x, mp_y = pg.mouse.get_pos()
@@ -493,6 +488,19 @@ while not done:
                         case "RANDOM":
                             rd_button()     
                             break  
+                        case "NEW GAME":
+                            ng_buttom()
+                            break
+                        case "SAVE":
+                            save_button()
+                            break
+                        case "LOAD":
+                            load_button()
+                            break
+                        case "QUIT":
+                            print("Exit")
+                            pg.quit()
+                            break
                 
         if pg.mouse.get_pressed()[2]:
             column = pos[0] // (width + margin)
