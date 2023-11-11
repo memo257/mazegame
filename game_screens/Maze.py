@@ -11,8 +11,10 @@ import time
 from queue import Queue
 import heapq
 import tkinter as tk
-from Button_game import Button
+from sprite_game import Button, UIE
 from tkinter import filedialog
+from tkinter import messagebox
+import pygame_gui
 
 #colors
 one = (79, 189, 186)
@@ -28,8 +30,8 @@ Black = '#fff'
 pg.init()
 
 #set size of each screen, screen 1 is the main screen, screen 2 is the button screen
-size = (1126, 729)
-screen1_size = (size[0] - 420, size[1])
+size = (1176, 729)
+screen1_size = (size[0] - 470, size[1])
 screen2_size = (size[0] - 706, size[1])
 screen1 = pg.display.set_mode(screen1_size)
 screen2 = pg.display.set_mode(screen2_size)
@@ -44,6 +46,7 @@ width = 20
 height = 20
 margin = 2
 count = 0
+count_algo = 0
 
 grid = [[0 for x in range(33)] for y in range(33)]
 gobalStartPoint = None
@@ -54,6 +57,10 @@ clock = pg.time.Clock()
 found = False
 neighbour=[]
 button_list = []
+algo = ""
+
+root = tk.Tk()
+root.withdraw()
 
 def savegrid():
     global grid
@@ -268,7 +275,7 @@ def neighbourr():
     count=0
     for i in range(len(grid)):
         for j in range(len(grid)):
-            neighbour[count] == []
+            #neighbour[count] == []
             if (i > 0 and grid[i - 1][j] != 1):
                 neighbour[count].append((i-1,j))
             if (j > 0 and grid[i][j - 1] != 1):
@@ -371,7 +378,6 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     create_maze(start_x, start_y)
 
     # Mark the start and end points
-
     grid[start_x][start_y] = 2
     grid[end_x][end_y] = 3
 
@@ -380,52 +386,71 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
 
     return grid
 
-def get_font(size):
-    return pg.font.Font("images/Debrosee-ALPnL.ttf", size)
 
-def create_buttons():
-    button_list.append(Button(800, 50, 120, 60, "PLAY", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 120, 120, 60, "CHANGE MAP", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 190, 120, 60, "RANDOM", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 260, 120, 60, "NEW GAME", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 330, 120, 60, "SAVE", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 400, 120, 60, "LOAD", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 600, 120, 60, "QUIT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+def get_font(size): #set the font and size 
+    return pg.font.Font("images/Aller_Rg.ttf", size)
+
+def create_buttons(): #create button
+    button_list.append(Button(800, 70, 120, 60, "PLAY", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(925, 70, 120, 60, "MAPS", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 140, 120, 60, "RANDOM", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(925, 140, 120, 60, "NEW GAME", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 210, 120, 60, "SAVE", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(925, 210, 120, 60, "LOAD", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(800, 280, 120, 60, "ALGORITHMS", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(870, 380, 120, 60, "UP", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(870, 520, 120, 60, "DOWN", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(780, 450, 120, 60, "LEFT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(950, 450, 120, 60, "RIGHT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
+    button_list.append(Button(870, 650, 120, 60, "QUIT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
     
-
-    for button in button_list:
+    
+    uie = UIE(925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")) #set a algorithm line
+    uie.draw(screen2)
+    
+    for button in button_list: #draw the buttons
         button.draw(screen2)
+        
+'''def message(message):
+    messagebox.showinfo("Message", message)'''
 
-def play_button():
+def play_button(): #this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
+    global algo
     if((sum(x.count(2) for x in grid)) == 1):
         print("Solving")
-        #bfs()
-        #a_star()
-        #dfs()
-        #dfs_simulation()
-        dijkstra()
-
-def cm_button():
+        match algo:
+            case "BFS":
+                bfs()
+            case "DFS":
+                dfs()
+            case "A*":
+                a_star()
+            case "DIJKSTRA":
+                dijkstra()
+            case default:
+                raise ValueError("Please choose an algorithm first") #If the user still click play without choosing an algorithm, the game will be escape and this line will run
+                
+def maps_button(): #this will set the map for the game, every click is a new map
     global count
     count += 1
-    if count > 5:
+    if count > 5: #5 maps in total, reach 5 then return to 1
         count = 1
     loadgrid(count)
     
-def rd_button():
+def rd_button(): #this will generate a map between 2 start point and end point
     print("Creating and loading a random maze")
     try:
         generate_solvability_maze_with_user_points(gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1])
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt",grid) # Load the generated maze
     except:
-        print("Please choose start and end point")
+        print("Please choose start and end point") #if user didn't set the start point and end point, announce them to do that 
     
-def ng_buttom():
+def ng_buttom(): #this will erase everything on the grid and set it to the initial grid
     global grid
     grid = [[0 for x in range(33)] for y in range(33)]
     
-def save_button():
+def save_button(): #this will save the game
     file_path = filedialog.asksaveasfilename(defaultextension=".txt")
     if file_path:
         # Perform save operation here
@@ -433,13 +458,43 @@ def save_button():
         np.savetxt(file_path, grid)
         print("File saved:", file_path)
         
-def load_button():
+def load_button(): #this will load the game
     file_path = filedialog.askopenfile(defaultextension=".txt")
     if file_path:
         global grid
         grid = np.genfromtxt(file_path, dtype=float, invalid_raise=False)
         grid = np.nan_to_num(grid, nan=0.0)  # Replace NaN values with 0.0
         grid = grid.astype(np.float64)
+        
+def algorithms_button(): #this will set the algorithm for algo
+    global count_algo, algo
+    algorithms = ["BFS", "DFS", "A*", "DIJKSTRA"]
+    count_algo += 1
+    if count_algo > 3: #there are 4 algorithms, reach the last one will return to the first one
+        count_algo = 0
+    algo = algorithms[count_algo]
+    
+def user_move(command): #this will set the movement of user, not completed
+    global grid
+    for i in range(len(grid)):
+        for j in range(len(grid)):
+            match command:
+                case "UP":
+                    if (i > 0 and grid[i - 1][j] != 1):
+                        grid[i - 1][j] = 2
+                    break
+                case "DOWN":
+                    if (i < len(grid) - 1 and grid[i + 1][j] != 1):
+                        grid[i + 1][j] = 2
+                    break
+                case "LEFT":
+                    if (j > 0 and grid[i][j - 1] != 1):
+                        grid[i][j - 1] = 2
+                    break
+                case "RIGHT":
+                    if (j < len(grid) - 1 and grid[i][j + 1] != 1):
+                        grid[i][j + 1] = 2
+                    break
 
 while not done:
     gobalStartPoint 
@@ -456,25 +511,13 @@ while not done:
     pg.display.get_surface().blit(screen2, (screen1.get_width(), 0))
     # Create the buttons
     create_buttons()
+    
+    uie = UIE(925, 310, text = algo, font=get_font(20), colour=pg.Color("black"))
+    uie.draw(screen2)  
 
     for event in pg.event.get(): 
         if event.type == pg.QUIT:
             done = True
-            
-        elif event.type == pg.KEYDOWN:
-            '''if event.key == pg.K_ESCAPE:
-                print("Exit")
-                pg.quit()
-            if event.key == pg.K_s:
-                print("Saving Maze")
-                savegrid()
-            if event.key == pg.K_l:
-                print("Loading Maze")
-                loadgrid(0)'''
-            if event.key == pg.K_f:
-                print("Filling Maze")
-                grid = [[1 for x in range(33)] for y in range(33)]
-        
         elif event.type == pg.MOUSEBUTTONDOWN:
             mp_x, mp_y = pg.mouse.get_pos()
             for button in button_list:
@@ -483,8 +526,8 @@ while not done:
                         case "PLAY":
                             play_button()
                             break
-                        case "CHANGE MAP":
-                            cm_button()  
+                        case "MAPS":
+                            maps_button()  
                             break
                         case "RANDOM":
                             rd_button()     
@@ -497,6 +540,21 @@ while not done:
                             break
                         case "LOAD":
                             load_button()
+                            break
+                        case "ALGORITHMS":
+                            algorithms_button()
+                            break
+                        case "UP":
+                            user_move("UP")
+                            break
+                        case "DOWN":
+                            user_move("DOWN")
+                            break
+                        case "LEFT":
+                            user_move("LEFT")
+                            break
+                        case "RIGHT":
+                            user_move("RIGHT")
                             break
                         case "QUIT":
                             print("Exit")
