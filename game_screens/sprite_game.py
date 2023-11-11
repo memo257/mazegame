@@ -1,6 +1,6 @@
 import pygame as pg
 
-class Button:
+class Button: #design the button
     def __init__(self, x, y, width, height, text, font, colour, tcolour):
         self.colour, self.tcolour = colour, tcolour
         self.x, self.y = x, y
@@ -19,3 +19,16 @@ class Button:
         
     def click(self, mouce_x, mouce_y):
         return self.x <= mouce_x <= self.x + self.width and self.y <= mouce_y <= self.y + self.height
+    
+class UIE: #design the text 
+    def __init__(self, x, y, text, font, colour):
+        self.x, self.y = x, y
+        self.text = text
+        self.font = font
+        self.colour = colour
+        
+    def draw(self, screen):
+        font = self.font
+        self.font_size = font.size(self.text)
+        text = font.render(self.text, True, self.colour)
+        screen.blit(text, (self.x, self.y))
