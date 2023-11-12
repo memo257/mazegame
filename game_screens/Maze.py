@@ -16,7 +16,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 import pygame_gui
 
-#colors
+# colors
 one = (79, 189, 186)
 two = (206, 171, 147)
 three = (227, 202, 165)
@@ -24,12 +24,12 @@ four = (255, 251, 233)
 five = (246, 137, 137)
 six = (255, 0, 0)
 seven = (0, 255, 0)
-Mindaro = '#C5D86D'
-Black = '#fff'
+Mindaro = "#C5D86D"
+Black = "#fff"
 
 pg.init()
 
-#set size of each screen, screen 1 is the main screen, screen 2 is the button screen
+# set size of each screen, screen 1 is the main screen, screen 2 is the button screen
 size = (1176, 729)
 screen1_size = (size[0] - 470, size[1])
 screen2_size = (size[0] - 706, size[1])
@@ -42,48 +42,55 @@ mouse_pos = pg.mouse.get_pos()
 
 pg.display.set_caption("MAZE")
 
+# size - "hard" level of maze; #MAX: 33
+block = 20
+
 width = 20
 height = 20
 margin = 2
 count = 0
 count_algo = 0
 
-grid = [[0 for x in range(33)] for y in range(33)]
+grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = None
 gobalEndPoint = None
 
 done = False
 clock = pg.time.Clock()
 found = False
-neighbour=[]
+neighbour = []
 button_list = []
 algo = ""
 
 root = tk.Tk()
 root.withdraw()
 
+
 def savegrid():
     global grid
-    
-    np.savetxt(r"./maze.txt",grid)
+
+    np.savetxt(r"./maze.txt", grid)
+
+
 def loadgrid(index):
     global grid
-    if(index ==0):
+    if index == 0:
         grid = np.loadtxt(r"./maingame/maze.txt").tolist()
-    elif(index ==1):
-        grid = np.loadtxt(r'./mazemap/Maze1/maze.txt').tolist()
-    elif(index ==2):
-        grid = np.loadtxt(r'./mazemap/Maze2/maze.txt').tolist()
-    elif(index ==3):
-        grid = np.loadtxt(r'./mazemap/Maze3/maze.txt').tolist()
-    elif(index ==4):
-        grid = np.loadtxt(r'./mazemap/Maze4/maze.txt').tolist()
-    elif(index ==5):
-        grid = np.loadtxt(r'./mazemap/Maze5/maze.txt').tolist()
-        
+    elif index == 1:
+        grid = np.loadtxt(r"./mazemap/Maze1/maze.txt").tolist()
+    elif index == 2:
+        grid = np.loadtxt(r"./mazemap/Maze2/maze.txt").tolist()
+    elif index == 3:
+        grid = np.loadtxt(r"./mazemap/Maze3/maze.txt").tolist()
+    elif index == 4:
+        grid = np.loadtxt(r"./mazemap/Maze4/maze.txt").tolist()
+    elif index == 5:
+        grid = np.loadtxt(r"./mazemap/Maze5/maze.txt").tolist()
+
+
 def bfs_shortestpath(maze, path=""):
     global grid
-    i,j=startp(maze,0,0)
+    i, j = startp(maze, 0, 0)
     pos = set()
     for move in path:
         if move == "L":
@@ -98,22 +105,23 @@ def bfs_shortestpath(maze, path=""):
         elif move == "D":
             j += 1
         pos.add((j, i))
-    
+
     for j, row in enumerate(maze):
         for i, col in enumerate(row):
             if (j, i) in pos:
-                
                 grid[j][i] = 4
-                
-def startp(maze,i,j):
+
+
+def startp(maze, i, j):
     for x in range(len(maze[0])):
         try:
-            i =(maze[x].index(2))
+            i = maze[x].index(2)
             j = x
             print(j)
-            return i,j
+            return i, j
         except:
             pass
+
 
 def bfs():
     global grid, neighbour
@@ -143,6 +151,7 @@ def bfs():
 
     return False
 
+
 def dfs():
     global grid, neighbour
     neighbourr()
@@ -168,7 +177,11 @@ def dfs():
             print_grid(grid)  # Function to display the grid (customize as needed)
             time.sleep(0.05)  # Add a delay to make it slower
 
-        unvisited_neighbors = [nei for nei in neighbour[current[0] * len(grid[0]) + current[1]] if nei not in visited]
+        unvisited_neighbors = [
+            nei
+            for nei in neighbour[current[0] * len(grid[0]) + current[1]]
+            if nei not in visited
+        ]
 
         if unvisited_neighbors:
             next_neighbor = unvisited_neighbors[0]
@@ -177,7 +190,7 @@ def dfs():
         else:
             # No unvisited neighbors, backtrack
             stack.pop()
-    
+
     return False
 
 
@@ -218,6 +231,7 @@ def dijkstra():
 
     return False
 
+
 def simulate_dijkstra_process(came_from, start, end, visited):
     # Backtrack to find the solution path
     current = end
@@ -248,8 +262,8 @@ def print_grid(grid):
 
     screen1.fill(two)
 
-    for row in range(33):
-        for column in range(33):
+    for row in range(block):
+        for column in range(block):
             if grid[row][column] == 1:
                 color = three
             elif grid[row][column] == 2:
@@ -265,64 +279,78 @@ def print_grid(grid):
             else:
                 color = four
 
-            pg.draw.rect(screen1, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
+            pg.draw.rect(
+                screen1,
+                color,
+                [
+                    margin + (margin + width) * column,
+                    margin + (margin + height) * row,
+                    width,
+                    height,
+                ],
+            )
 
     pg.display.flip()
 
+
 def neighbourr():
-    global grid,neighbour
-    neighbour = [[]for col in range(len(grid)) for row in range(len(grid))]
-    count=0
+    global grid, neighbour
+    neighbour = [[] for col in range(len(grid)) for row in range(len(grid))]
+    count = 0
     for i in range(len(grid)):
         for j in range(len(grid)):
-            #neighbour[count] == []
-            if (i > 0 and grid[i - 1][j] != 1):
-                neighbour[count].append((i-1,j))
-            if (j > 0 and grid[i][j - 1] != 1):
-                neighbour[count].append((i,j-1))
-            if (i < len(grid) - 1 and grid[i + 1][j] != 1):
-                neighbour[count].append((i+1,j))
-            if (j < len(grid) - 1 and grid[i][j + 1] != 1):
-                neighbour[count].append((i,j+1))
-            count+=1
-            
-def h(p1, p2):
-	x1, y1 = p1
-	x2, y2 = p2
-	return abs(x1 - x2) + abs(y1 - y2)
+            # neighbour[count] == []
+            if i > 0 and grid[i - 1][j] != 1:
+                neighbour[count].append((i - 1, j))
+            if j > 0 and grid[i][j - 1] != 1:
+                neighbour[count].append((i, j - 1))
+            if i < len(grid) - 1 and grid[i + 1][j] != 1:
+                neighbour[count].append((i + 1, j))
+            if j < len(grid) - 1 and grid[i][j + 1] != 1:
+                neighbour[count].append((i, j + 1))
+            count += 1
 
-def S_E(maze,start,end):
+
+def h(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return abs(x1 - x2) + abs(y1 - y2)
+
+
+def S_E(maze, start, end):
     for x in range(len(grid)):
         for y in range(len(grid[x])):
-            if(grid[x][y]==2):
-                start =x,y
-            if(grid[x][y]==3):
-                end =x,y
-       
-    return start,end
+            if grid[x][y] == 2:
+                start = x, y
+            if grid[x][y] == 3:
+                end = x, y
+
+    return start, end
+
 
 def short_path(came_from, current):
-     grid[current[0]][current[1]] = 4
-     while current in came_from:
-         current = came_from[current]
-         grid[current[0]][current[1]] = 4
-        
+    grid[current[0]][current[1]] = 4
+    while current in came_from:
+        current = came_from[current]
+        grid[current[0]][current[1]] = 4
+
+
 def a_star():
     global grid, neighbour
     neighbourr()
 
-    start,end = S_E(grid,0,0)
+    start, end = S_E(grid, 0, 0)
     count = 0
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     open_set_his = {start}
     came_from = {}
-    
-    g_score = [float("inf") for row in grid for spot in row ]
-    g_score[start[0]*len(grid[0]) +start[1]] = 0
-    f_score = [ float("inf") for row in grid for spot in row ]
-    f_score[start[0]*len(grid[0]) +start[1]] = h(start, end)
-    
+
+    g_score = [float("inf") for row in grid for spot in row]
+    g_score[start[0] * len(grid[0]) + start[1]] = 0
+    f_score = [float("inf") for row in grid for spot in row]
+    f_score[start[0] * len(grid[0]) + start[1]] = h(start, end)
+
     while not open_set.empty():
         current = open_set.get()[2]
         open_set_his.remove(current)
@@ -330,28 +358,28 @@ def a_star():
             print("finishing")
             short_path(came_from, end)
             return True
-        for nei in neighbour[current[0]*len(grid[0]) +current[1]]:
-            temp_g_score = g_score[current[0]*len(grid[0]) +current[1]] + 1
-            if temp_g_score < g_score[nei[0]*len(grid[0]) +nei[1]]:
+        for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
+            temp_g_score = g_score[current[0] * len(grid[0]) + current[1]] + 1
+            if temp_g_score < g_score[nei[0] * len(grid[0]) + nei[1]]:
                 came_from[nei] = current
-                g_score[nei[0]*len(grid[0]) +nei[1]] = temp_g_score
-                f_score[nei[0]*len(grid[0]) +nei[1]] = temp_g_score + h(nei, end)
+                g_score[nei[0] * len(grid[0]) + nei[1]] = temp_g_score
+                f_score[nei[0] * len(grid[0]) + nei[1]] = temp_g_score + h(nei, end)
                 if nei not in open_set_his:
                     count += 1
-                    open_set.put((f_score[nei[0]*len(grid[0]) +nei[1]], count, nei))
+                    open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
     return False
+
 
 def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     global grid
 
     def is_valid(x, y):
-        return 0 <= x < 32 and 0 <= y < 32
+        return 0 <= x < block and 0 <= y < block
 
     def get_neighbours(x, y):
         neighbours = []
         for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
-        
             new_x, new_y = x + dx, y + dy
             if is_valid(new_x, new_y):
                 neighbours.append((new_x, new_y))
@@ -368,11 +396,11 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
                 create_maze(next_x, next_y)
 
     # Initialize the maze with walls (1s)
-    grid = [[1 for _ in range(33)] for _ in range(33)]
+    grid = [[1 for _ in range(block)] for _ in range(block)]
 
     # Make sure the start and end points are valid
-    start_x, start_y = max(1, min(start_x, 31)), max(1, min(start_y, 31))
-    end_x, end_y = max(1, min(end_x, 31)), max(1, min(end_y, 31))
+    start_x, start_y = max(0, min(start_x, 31)), max(0, min(start_y, 31))
+    end_x, end_y = max(0, min(end_x, 31)), max(0, min(end_y, 31))
 
     # Generate the maze
     create_maze(start_x, start_y)
@@ -387,36 +415,172 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     return grid
 
 
-def get_font(size): #set the font and size 
+def get_font(size):  # set the font and size
     return pg.font.Font("images/Aller_Rg.ttf", size)
 
-def create_buttons(): #create button
-    button_list.append(Button(800, 70, 120, 60, "PLAY", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(925, 70, 120, 60, "MAPS", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 140, 120, 60, "RANDOM", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(925, 140, 120, 60, "NEW GAME", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 210, 120, 60, "SAVE", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(925, 210, 120, 60, "LOAD", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(800, 280, 120, 60, "ALGORITHMS", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(870, 380, 120, 60, "UP", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(870, 520, 120, 60, "DOWN", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(780, 450, 120, 60, "LEFT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(950, 450, 120, 60, "RIGHT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    button_list.append(Button(870, 650, 120, 60, "QUIT", font=get_font(20), colour=Mindaro, tcolour=pg.Color("black")))
-    
-    
-    uie = UIE(925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")) #set a algorithm line
-    uie.draw(screen2)
-    
-    for button in button_list: #draw the buttons
-        button.draw(screen2)
-        
-'''def message(message):
-    messagebox.showinfo("Message", message)'''
 
-def play_button(): #this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
+def create_buttons():  # create button
+    button_list.append(
+        Button(
+            800,
+            70,
+            120,
+            60,
+            "PLAY",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            925,
+            70,
+            120,
+            60,
+            "MAPS",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            800,
+            140,
+            120,
+            60,
+            "RANDOM",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            925,
+            140,
+            120,
+            60,
+            "NEW GAME",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            800,
+            210,
+            120,
+            60,
+            "SAVE",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            925,
+            210,
+            120,
+            60,
+            "LOAD",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            800,
+            280,
+            120,
+            60,
+            "ALGORITHMS",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            870,
+            380,
+            120,
+            60,
+            "UP",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            870,
+            520,
+            120,
+            60,
+            "DOWN",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            780,
+            450,
+            120,
+            60,
+            "LEFT",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            950,
+            450,
+            120,
+            60,
+            "RIGHT",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
+            870,
+            650,
+            120,
+            60,
+            "QUIT",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+
+    uie = UIE(
+        925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")
+    )  # set a algorithm line
+    uie.draw(screen2)
+
+    for button in button_list:  # draw the buttons
+        button.draw(screen2)
+
+
+"""def message(message):
+    messagebox.showinfo("Message", message)"""
+
+
+def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
     global algo
-    if((sum(x.count(2) for x in grid)) == 1):
+    if (sum(x.count(2) for x in grid)) == 1:
         print("Solving")
         match algo:
             case "BFS":
@@ -428,94 +592,110 @@ def play_button(): #this will check the algo, whether it is BFS, DFS, A* or DIJK
             case "DIJKSTRA":
                 dijkstra()
             case default:
-                raise ValueError("Please choose an algorithm first") #If the user still click play without choosing an algorithm, the game will be escape and this line will run
-                
-def maps_button(): #this will set the map for the game, every click is a new map
+                raise ValueError(
+                    "Please choose an algorithm first"
+                )  # If the user still click play without choosing an algorithm, the game will be escape and this line will run
+
+
+def maps_button():  # this will set the map for the game, every click is a new map
     global count
     count += 1
-    if count > 5: #5 maps in total, reach 5 then return to 1
+    if count > 5:  # 5 maps in total, reach 5 then return to 1
         count = 1
     loadgrid(count)
-    
-def rd_button(): #this will generate a map between 2 start point and end point
+
+
+def rd_button():  # this will generate a map between 2 start point and end point
     print("Creating and loading a random maze")
     try:
-        generate_solvability_maze_with_user_points(gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1])
+        generate_solvability_maze_with_user_points(
+            gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1]
+        )
         savegrid()  # Save the generated maze
-        np.savetxt(r"./maze.txt",grid) # Load the generated maze
+        np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
-        print("Please choose start and end point") #if user didn't set the start point and end point, announce them to do that 
-    
-def ng_buttom(): #this will erase everything on the grid and set it to the initial grid
+        print(
+            "Please choose start and end point"
+        )  # if user didn't set the start point and end point, announce them to do that
+
+
+def ng_buttom():  # this will erase everything on the grid and set it to the initial grid
     global grid
-    grid = [[0 for x in range(33)] for y in range(33)]
-    
-def save_button(): #this will save the game
+    grid = [[0 for x in range(block)] for y in range(block)]
+
+
+def save_button():  # this will save the game
     file_path = filedialog.asksaveasfilename(defaultextension=".txt")
     if file_path:
         # Perform save operation here
         global grid
         np.savetxt(file_path, grid)
         print("File saved:", file_path)
-        
-def load_button(): #this will load the game
+
+
+def load_button():  # this will load the game
     file_path = filedialog.askopenfile(defaultextension=".txt")
     if file_path:
         global grid
         grid = np.genfromtxt(file_path, dtype=float, invalid_raise=False)
         grid = np.nan_to_num(grid, nan=0.0)  # Replace NaN values with 0.0
         grid = grid.astype(np.float64)
-        
-def algorithms_button(): #this will set the algorithm for algo
+
+
+def algorithms_button():  # this will set the algorithm for algo
     global count_algo, algo
     algorithms = ["BFS", "DFS", "A*", "DIJKSTRA"]
     count_algo += 1
-    if count_algo > 3: #there are 4 algorithms, reach the last one will return to the first one
+    if (
+        count_algo > 3
+    ):  # there are 4 algorithms, reach the last one will return to the first one
         count_algo = 0
     algo = algorithms[count_algo]
-    
-def user_move(command): #this will set the movement of user, not completed
+
+
+def user_move(command):  # this will set the movement of user, not completed
     global grid
     for i in range(len(grid)):
         for j in range(len(grid)):
             match command:
                 case "UP":
-                    if (i > 0 and grid[i - 1][j] != 1):
+                    if i > 0 and grid[i - 1][j] != 1:
                         grid[i - 1][j] = 2
                     break
                 case "DOWN":
-                    if (i < len(grid) - 1 and grid[i + 1][j] != 1):
+                    if i < len(grid) - 1 and grid[i + 1][j] != 1:
                         grid[i + 1][j] = 2
                     break
                 case "LEFT":
-                    if (j > 0 and grid[i][j - 1] != 1):
+                    if j > 0 and grid[i][j - 1] != 1:
                         grid[i][j - 1] = 2
                     break
                 case "RIGHT":
-                    if (j < len(grid) - 1 and grid[i][j + 1] != 1):
+                    if j < len(grid) - 1 and grid[i][j + 1] != 1:
                         grid[i][j + 1] = 2
                     break
 
+
 while not done:
-    gobalStartPoint 
-    gobalEndPoint 
-    
+    gobalStartPoint
+    gobalEndPoint
+
     pos = pg.mouse.get_pos()
     x = pos[0]
     y = pos[1]
     screen1.fill(two)
     screen2.fill(two)
-    
+
     # Blit the two screens onto the main display surface
     pg.display.get_surface().blit(screen1, (0, 0))
     pg.display.get_surface().blit(screen2, (screen1.get_width(), 0))
     # Create the buttons
     create_buttons()
-    
-    uie = UIE(925, 310, text = algo, font=get_font(20), colour=pg.Color("black"))
-    uie.draw(screen2)  
 
-    for event in pg.event.get(): 
+    uie = UIE(925, 310, text=algo, font=get_font(20), colour=pg.Color("black"))
+    uie.draw(screen2)
+
+    for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
         elif event.type == pg.MOUSEBUTTONDOWN:
@@ -527,11 +707,11 @@ while not done:
                             play_button()
                             break
                         case "MAPS":
-                            maps_button()  
+                            maps_button()
                             break
                         case "RANDOM":
-                            rd_button()     
-                            break  
+                            rd_button()
+                            break
                         case "NEW GAME":
                             ng_buttom()
                             break
@@ -560,47 +740,49 @@ while not done:
                             print("Exit")
                             pg.quit()
                             break
-                
+
         if pg.mouse.get_pressed()[2]:
             column = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
-            if((sum(x.count(2) for x in grid)) < 1 or (sum(x.count(3) for x in grid)) < 1):
-                if((sum(x.count(2) for x in grid)) == 0):
-                    if(grid[row][column] == 2):
+            if (sum(x.count(2) for x in grid)) < 1 or (
+                sum(x.count(3) for x in grid)
+            ) < 1:
+                if (sum(x.count(2) for x in grid)) == 0:
+                    if grid[row][column] == 2:
                         grid[row][column] = 0
-                    elif(grid[row][column] == 3):
+                    elif grid[row][column] == 3:
                         grid[row][column] = 0
                     else:
-                        grid[row][column]  = 2
+                        grid[row][column] = 2
                         gobalStartPoint = (row, column)
                 else:
-                    if(grid[row][column] == 3):
+                    if grid[row][column] == 3:
                         grid[row][column] = 0
-                    elif(grid[row][column] == 2):
+                    elif grid[row][column] == 2:
                         grid[row][column] = 0
                     else:
-                        grid[row][column]  = 3
+                        grid[row][column] = 3
                         gobalEndPoint = (row, column)
 
             else:
-                if(grid[row][column] == 2):
+                if grid[row][column] == 2:
                     grid[row][column] = 0
-                if(grid[row][column] == 3):
+                if grid[row][column] == 3:
                     grid[row][column] = 0
-                if(grid[row][column] == 1):
+                if grid[row][column] == 1:
                     grid[row][column] = 0
-                    
+
         if pg.mouse.get_pressed()[0]:
             column = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
             if row < 0 or row >= len(grid) or column < 0 or column >= len(grid[0]):
                 continue
-            else: 
+            else:
                 print("left click")
                 grid[row][column] = 1
-    
-    for row in range(33):
-        for column in range(33):
+
+    for row in range(block):
+        for column in range(block):
             if grid[row][column] == 1:
                 color = three
             elif grid[row][column] == 2:
@@ -615,7 +797,16 @@ while not done:
                 color = seven
             else:
                 color = four
-            pg.draw.rect(screen1, color, [margin + (margin + width) * column, margin + (margin + height) * row, width, height])
+            pg.draw.rect(
+                screen1,
+                color,
+                [
+                    margin + (margin + width) * column,
+                    margin + (margin + height) * row,
+                    width,
+                    height,
+                ],
+            )
     pg.display.flip()
     clock.tick(60)
     pg.display.update()
