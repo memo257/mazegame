@@ -155,6 +155,48 @@ def bfs():
     return False
 
 
+# def dfs():
+#     global grid, neighbour
+#     neighbourr()
+
+#     start, end = S_E(grid, 0, 0)
+
+#     stack = [start]
+#     came_from = {}
+#     visited = set()
+
+#     while stack:
+#         current = stack[-1]
+
+#         if current == end:
+#             print("Finishing - solve by dfs")
+#             short_path(came_from, end)
+#             return True
+
+#         if current not in visited:
+#             visited.add(current)
+#             # Simulation code to visualize the DFS process
+#             grid[current[0]][current[1]] = 5
+#             print_grid(grid)  # Function to display the grid (customize as needed)
+#             time.sleep(0.05)  # Add a delay to make it slower
+
+#         unvisited_neighbors = [
+#             nei
+#             for nei in neighbour[current[0] * len(grid[0]) + current[1]]
+#             if nei not in visited
+#         ]
+
+#         if unvisited_neighbors:
+#             next_neighbor = unvisited_neighbors[0]
+#             stack.append(next_neighbor)
+#             came_from[next_neighbor] = current
+#         else:
+#             # No unvisited neighbors, backtrack
+#             stack.pop()
+
+#     return False
+
+
 def dfs():
     global grid, neighbour
     neighbourr()
@@ -187,6 +229,7 @@ def dfs():
         ]
 
         if unvisited_neighbors:
+            random.shuffle(unvisited_neighbors)
             next_neighbor = unvisited_neighbors[0]
             stack.append(next_neighbor)
             came_from[next_neighbor] = current
@@ -580,10 +623,10 @@ def create_buttons():  # create button
         )
     )
 
-    '''uie = UIE(
+    """uie = UIE(
         925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")
     )  # set a algorithm line
-    uie.draw(screen2)'''
+    uie.draw(screen2)"""
 
     for button in button_list:  # draw the buttons
         button.draw(screen2)
@@ -659,7 +702,8 @@ def algorithms_button():  # this will set the algorithm for algo
         count_algo = 1
     algo = algorithms[count_algo]
 
-def levels_button(): # this will set the level
+
+def levels_button():  # this will set the level
     global count_level, level, block, grid
     levels = ["EASY", "INTERMEDIATE", "HARD"]
     count_level += 1
