@@ -49,7 +49,8 @@ width = 20
 height = 20
 margin = 2
 count = 0
-count_algo = 0
+count_algo = 1
+count_level = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = None
@@ -60,7 +61,9 @@ clock = pg.time.Clock()
 found = False
 neighbour = []
 button_list = []
-algo = ""
+line_list = []
+algo = "BFS"
+level = "EASY"
 
 root = tk.Tk()
 root.withdraw()
@@ -423,7 +426,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            70,
+            50,
             120,
             60,
             "PLAY",
@@ -435,7 +438,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            70,
+            50,
             120,
             60,
             "MAPS",
@@ -447,7 +450,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            140,
+            120,
             120,
             60,
             "RANDOM",
@@ -459,7 +462,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            140,
+            120,
             120,
             60,
             "NEW GAME",
@@ -471,7 +474,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            210,
+            190,
             120,
             60,
             "SAVE",
@@ -483,7 +486,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            210,
+            190,
             120,
             60,
             "LOAD",
@@ -495,7 +498,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            280,
+            260,
             120,
             60,
             "ALGORITHMS",
@@ -506,8 +509,20 @@ def create_buttons():  # create button
     )
     button_list.append(
         Button(
+            800,
+            330,
+            120,
+            60,
+            "LEVELS",
+            font=get_font(20),
+            colour=Mindaro,
+            tcolour=pg.Color("black"),
+        )
+    )
+    button_list.append(
+        Button(
             870,
-            380,
+            400,
             120,
             60,
             "UP",
@@ -519,7 +534,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             870,
-            520,
+            540,
             120,
             60,
             "DOWN",
@@ -531,7 +546,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             780,
-            450,
+            470,
             120,
             60,
             "LEFT",
@@ -543,7 +558,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             950,
-            450,
+            470,
             120,
             60,
             "RIGHT",
@@ -565,17 +580,13 @@ def create_buttons():  # create button
         )
     )
 
-    uie = UIE(
+    '''uie = UIE(
         925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")
     )  # set a algorithm line
-    uie.draw(screen2)
+    uie.draw(screen2)'''
 
     for button in button_list:  # draw the buttons
         button.draw(screen2)
-
-
-"""def message(message):
-    messagebox.showinfo("Message", message)"""
 
 
 def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
@@ -591,10 +602,6 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
                 a_star()
             case "DIJKSTRA":
                 dijkstra()
-            case default:
-                raise ValueError(
-                    "Please choose an algorithm first"
-                )  # If the user still click play without choosing an algorithm, the game will be escape and this line will run
 
 
 def maps_button():  # this will set the map for the game, every click is a new map
@@ -644,13 +651,36 @@ def load_button():  # this will load the game
 
 def algorithms_button():  # this will set the algorithm for algo
     global count_algo, algo
-    algorithms = ["BFS", "DFS", "A*", "DIJKSTRA"]
+    algorithms = ["", "BFS", "DFS", "A*", "DIJKSTRA"]
     count_algo += 1
     if (
-        count_algo > 3
+        count_algo > 4
     ):  # there are 4 algorithms, reach the last one will return to the first one
-        count_algo = 0
+        count_algo = 1
     algo = algorithms[count_algo]
+
+def levels_button(): # this will set the level
+    global count_level, level, block, grid
+    levels = ["EASY", "INTERMEDIATE", "HARD"]
+    count_level += 1
+    if (
+        count_level > 2
+    ):  # there are 4 algorithms, reach the last one will return to the first one
+        count_level = 0
+    level = levels[count_level]
+    match level:
+        case "EASY":
+            block = 20
+            grid = [[0 for x in range(block)] for y in range(block)]
+            print_grid(grid)
+        case "INTERMEDIATE":
+            block = 27
+            grid = [[0 for x in range(block)] for y in range(block)]
+            print_grid(grid)
+        case "HARD":
+            block = 33
+            grid = [[0 for x in range(block)] for y in range(block)]
+            print_grid(grid)
 
 
 def user_move(command):  # this will set the movement of user, not completed
@@ -692,8 +722,10 @@ while not done:
     # Create the buttons
     create_buttons()
 
-    uie = UIE(925, 310, text=algo, font=get_font(20), colour=pg.Color("black"))
+    uie = UIE(925, 280, text=algo, font=get_font(20), colour=pg.Color("black"))
     uie.draw(screen2)
+    uie2 = UIE(925, 350, text=level, font=get_font(20), colour=pg.Color("black"))
+    uie2.draw(screen2)
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -723,6 +755,9 @@ while not done:
                             break
                         case "ALGORITHMS":
                             algorithms_button()
+                            break
+                        case "LEVELS":
+                            levels_button()
                             break
                         case "UP":
                             user_move("UP")
