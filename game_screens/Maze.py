@@ -48,9 +48,10 @@ block = 20
 width = 20
 height = 20
 margin = 2
-count = 0
+count_map = 0
 count_algo = 1
 count_level = 0
+check_rd = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = None
@@ -71,7 +72,6 @@ root.withdraw()
 
 def savegrid():
     global grid
-
     np.savetxt(r"./maze.txt", grid)
 
 
@@ -90,42 +90,6 @@ def loadgrid(index):
     elif index == 5:
         grid = np.loadtxt(r"./mazemap/Maze5/maze.txt").tolist()
 
-
-def bfs_shortestpath(maze, path=""):
-    global grid
-    i, j = startp(maze, 0, 0)
-    pos = set()
-    for move in path:
-        if move == "L":
-            i -= 1
-
-        elif move == "R":
-            i += 1
-
-        elif move == "U":
-            j -= 1
-
-        elif move == "D":
-            j += 1
-        pos.add((j, i))
-
-    for j, row in enumerate(maze):
-        for i, col in enumerate(row):
-            if (j, i) in pos:
-                grid[j][i] = 4
-
-
-def startp(maze, i, j):
-    for x in range(len(maze[0])):
-        try:
-            i = maze[x].index(2)
-            j = x
-            print(j)
-            return i, j
-        except:
-            pass
-
-
 def bfs():
     global grid, neighbour
     neighbourr()
@@ -141,7 +105,7 @@ def bfs():
         current = open_set.get()
 
         if current == end:
-            print("Finishing")
+            messagebox.showinfo("Solved", "Finished solving the maze using BFS")
             short_path(came_from, end)
             return True
 
@@ -151,6 +115,7 @@ def bfs():
             if nei not in visited:
                 open_set.put(nei)
                 came_from[nei] = current
+    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
 
     return False
 
@@ -211,7 +176,7 @@ def dfs():
         current = stack[-1]
 
         if current == end:
-            print("Finishing - solve by dfs")
+            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
             short_path(came_from, end)
             return True
 
@@ -236,6 +201,7 @@ def dfs():
         else:
             # No unvisited neighbors, backtrack
             stack.pop()
+    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
 
     return False
 
@@ -262,7 +228,7 @@ def dijkstra():
             time.sleep(0.1)  # Add a delay to make it slower
 
         if current == end:
-            print("Finishing - solve by Dijkstra ")
+            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
             short_path(came_from, end)
             simulate_dijkstra_process(came_from, start, end, visited)
             return True
@@ -274,6 +240,7 @@ def dijkstra():
                 priority = new_cost
                 heapq.heappush(open_set, (priority, nei))
                 came_from[nei] = current
+    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
 
     return False
 
@@ -401,7 +368,7 @@ def a_star():
         current = open_set.get()[2]
         open_set_his.remove(current)
         if current == end:
-            print("finishing")
+            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
             short_path(came_from, end)
             return True
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
@@ -414,6 +381,7 @@ def a_star():
                     count += 1
                     open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
+    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
 
 
@@ -564,47 +532,11 @@ def create_buttons():  # create button
     )
     button_list.append(
         Button(
-            870,
+            800,
             400,
             120,
             60,
-            "UP",
-            font=get_font(20),
-            colour=Mindaro,
-            tcolour=pg.Color("black"),
-        )
-    )
-    button_list.append(
-        Button(
-            870,
-            540,
-            120,
-            60,
-            "DOWN",
-            font=get_font(20),
-            colour=Mindaro,
-            tcolour=pg.Color("black"),
-        )
-    )
-    button_list.append(
-        Button(
-            780,
-            470,
-            120,
-            60,
-            "LEFT",
-            font=get_font(20),
-            colour=Mindaro,
-            tcolour=pg.Color("black"),
-        )
-    )
-    button_list.append(
-        Button(
-            950,
-            470,
-            120,
-            60,
-            "RIGHT",
+            "RESET",
             font=get_font(20),
             colour=Mindaro,
             tcolour=pg.Color("black"),
@@ -622,12 +554,7 @@ def create_buttons():  # create button
             tcolour=pg.Color("black"),
         )
     )
-
-    """uie = UIE(
-        925, 280, "Algorithms: ", font=get_font(20), colour=pg.Color("black")
-    )  # set a algorithm line
-    uie.draw(screen2)"""
-
+    
     for button in button_list:  # draw the buttons
         button.draw(screen2)
 
@@ -635,6 +562,7 @@ def create_buttons():  # create button
 def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
     global algo
     if (sum(x.count(2) for x in grid)) == 1:
+    #if (any(x.count(2) >= 1 for x in grid)):
         print("Solving")
         match algo:
             case "BFS":
@@ -648,11 +576,11 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
 
 
 def maps_button():  # this will set the map for the game, every click is a new map
-    global count
-    count += 1
-    if count > 5:  # 5 maps in total, reach 5 then return to 1
-        count = 1
-    loadgrid(count)
+    global count_map
+    count_map += 1
+    if count_map > 5:  # 5 maps in total, reach 5 then return to 1
+        count_map = 1
+    loadgrid(count_map)
 
 
 def rd_button():  # this will generate a map between 2 start point and end point
@@ -662,7 +590,7 @@ def rd_button():  # this will generate a map between 2 start point and end point
             gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1]
         )
         savegrid()  # Save the generated maze
-        np.savetxt(r"./maze.txt", grid)  # Load the generated maze
+        np.savetxt(r"maingame/maze.txt", grid)  # Load the generated maze
     except:
         print(
             "Please choose start and end point"
@@ -687,9 +615,7 @@ def load_button():  # this will load the game
     file_path = filedialog.askopenfile(defaultextension=".txt")
     if file_path:
         global grid
-        grid = np.genfromtxt(file_path, dtype=float, invalid_raise=False)
-        grid = np.nan_to_num(grid, nan=0.0)  # Replace NaN values with 0.0
-        grid = grid.astype(np.float64)
+        grid = np.loadtxt(file_path).tolist()
 
 
 def algorithms_button():  # this will set the algorithm for algo
@@ -749,6 +675,13 @@ def user_move(command):  # this will set the movement of user, not completed
                         grid[i][j + 1] = 2
                     break
 
+def reset_button(map):
+    global check_rd
+    if check_rd == 1:
+        global grid
+        grid = np.loadtxt("maingame/maze.txt").tolist()
+    else:
+        loadgrid(map)
 
 while not done:
     gobalStartPoint
@@ -774,6 +707,15 @@ while not done:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_UP:
+                user_move("UP")
+            if event.key == pg.K_DOWN:
+                user_move("DOWN")
+            if event.key == pg.K_LEFT:
+                user_move("LEFT")
+            if event.key == pg.K_RIGHT:
+                user_move("RIGHT")
         elif event.type == pg.MOUSEBUTTONDOWN:
             mp_x, mp_y = pg.mouse.get_pos()
             for button in button_list:
@@ -783,12 +725,15 @@ while not done:
                             play_button()
                             break
                         case "MAPS":
+                            check_rd = 0
                             maps_button()
                             break
                         case "RANDOM":
+                            check_rd = 1
                             rd_button()
                             break
                         case "NEW GAME":
+                            check_rd = 0
                             ng_buttom()
                             break
                         case "SAVE":
@@ -803,21 +748,11 @@ while not done:
                         case "LEVELS":
                             levels_button()
                             break
-                        case "UP":
-                            user_move("UP")
-                            break
-                        case "DOWN":
-                            user_move("DOWN")
-                            break
-                        case "LEFT":
-                            user_move("LEFT")
-                            break
-                        case "RIGHT":
-                            user_move("RIGHT")
+                        case "RESET":
+                            reset_button(count_map)
                             break
                         case "QUIT":
-                            print("Exit")
-                            pg.quit()
+                            done = True
                             break
 
         if pg.mouse.get_pressed()[2]:
