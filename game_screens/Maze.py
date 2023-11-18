@@ -90,6 +90,50 @@ def loadgrid(index):
     elif index == 5:
         grid = np.loadtxt(r"./mazemap/Maze5/maze.txt").tolist()
 
+
+def loadgridWithLevel(index, level):
+    global grid
+    if level == "HARD":
+        if index == 0:
+            grid = np.loadtxt(r"./maingame/maze.txt").tolist()
+        elif index == 1:
+            grid = np.loadtxt(r"./mazemap/Maze1/maze.txt").tolist()
+        elif index == 2:
+            grid = np.loadtxt(r"./mazemap/Maze2/maze.txt").tolist()
+        elif index == 3:
+            grid = np.loadtxt(r"./mazemap/Maze3/maze.txt").tolist()
+        elif index == 4:
+            grid = np.loadtxt(r"./mazemap/Maze4/maze.txt").tolist()
+        elif index == 5:
+            grid = np.loadtxt(r"./mazemap/Maze5/maze.txt").tolist()
+    if level == "INTERMEDIATE":
+        if index == 0:
+            grid = np.loadtxt(r"./mazemap/Maze6/maze6.txt").tolist()
+        elif index == 1:
+            grid = np.loadtxt(r"./mazemap/Maze7/maze7.txt").tolist()
+        elif index == 2:
+            grid = np.loadtxt(r"./mazemap/Maze8/maze8.txt").tolist()
+        if index == 3:
+            grid = np.loadtxt(r"./mazemap/Maze9/maze6.txt").tolist()
+        elif index == 4:
+            grid = np.loadtxt(r"./mazemap/Maze7/maze7.txt").tolist()
+        elif index == 5:
+            grid = np.loadtxt(r"./mazemap/Maze8/maze8.txt").tolist()
+    if level == "EASY":
+        if index == 0:
+            grid = np.loadtxt(r"./mazemap/Maze11/maze11.txt").tolist()
+        elif index == 1:
+            grid = np.loadtxt(r"./mazemap/Maze12/maze12.txt").tolist()
+        elif index == 2:
+            grid = np.loadtxt(r"./mazemap/Maze13/maze13.txt").tolist()
+        if index == 3:
+            grid = np.loadtxt(r"./mazemap/Maze11/maze11.txt").tolist()
+        elif index == 4:
+            grid = np.loadtxt(r"./mazemap/Maze12/maze12.txt").tolist()
+        elif index == 5:
+            grid = np.loadtxt(r"./mazemap/Maze14/maze14.txt").tolist()
+
+
 def bfs():
     global grid, neighbour
     neighbourr()
@@ -554,7 +598,7 @@ def create_buttons():  # create button
             tcolour=pg.Color("black"),
         )
     )
-    
+
     for button in button_list:  # draw the buttons
         button.draw(screen2)
 
@@ -562,7 +606,7 @@ def create_buttons():  # create button
 def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
     global algo
     if (sum(x.count(2) for x in grid)) == 1:
-    #if (any(x.count(2) >= 1 for x in grid)):
+        # if (any(x.count(2) >= 1 for x in grid)):
         print("Solving")
         match algo:
             case "BFS":
@@ -577,10 +621,12 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
 
 def maps_button():  # this will set the map for the game, every click is a new map
     global count_map
+    global level
     count_map += 1
     if count_map > 5:  # 5 maps in total, reach 5 then return to 1
         count_map = 1
-    loadgrid(count_map)
+    # loadgrid(count_map)
+    loadgridWithLevel(count_map, level)
 
 
 def rd_button():  # this will generate a map between 2 start point and end point
@@ -675,6 +721,7 @@ def user_move(command):  # this will set the movement of user, not completed
                         grid[i][j + 1] = 2
                     break
 
+
 def reset_button(map):
     global check_rd
     if check_rd == 1:
@@ -682,6 +729,7 @@ def reset_button(map):
         grid = np.loadtxt("maingame/maze.txt").tolist()
     else:
         loadgrid(map)
+
 
 while not done:
     gobalStartPoint
