@@ -134,6 +134,13 @@ def loadgridWithLevel(index, level):
             grid = np.loadtxt(r"./mazemap/Maze14/maze14.txt").tolist()
 
 
+def eventHandle():
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit()
+
+
 def bfs():
     global grid, neighbour
     neighbourr()
@@ -217,6 +224,8 @@ def dfs():
     visited = set()
 
     while stack:
+        eventHandle()
+
         current = stack[-1]
 
         if current == end:
@@ -263,6 +272,7 @@ def dijkstra():
     visited = set()
 
     while open_set:
+        eventHandle()
         _, current = heapq.heappop(open_set)
 
         if current not in visited:
@@ -731,6 +741,99 @@ def reset_button(map):
         loadgrid(map)
 
 
+def handleInput(pg):
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            done = True
+        elif event.type == pg.KEYDOWN:
+            if event.key == pg.K_UP:
+                user_move("UP")
+            if event.key == pg.K_DOWN:
+                user_move("DOWN")
+            if event.key == pg.K_LEFT:
+                user_move("LEFT")
+            if event.key == pg.K_RIGHT:
+                user_move("RIGHT")
+        elif event.type == pg.MOUSEBUTTONDOWN:
+            mp_x, mp_y = pg.mouse.get_pos()
+            for button in button_list:
+                if button.click(mp_x, mp_y):
+                    match button.text:
+                        case "PLAY":
+                            play_button()
+                            break
+                        case "MAPS":
+                            check_rd = 0
+                            maps_button()
+                            break
+                        case "RANDOM":
+                            check_rd = 1
+                            rd_button()
+                            break
+                        case "NEW GAME":
+                            check_rd = 0
+                            ng_buttom()
+                            break
+                        case "SAVE":
+                            save_button()
+                            break
+                        case "LOAD":
+                            load_button()
+                            break
+                        case "ALGORITHMS":
+                            algorithms_button()
+                            break
+                        case "LEVELS":
+                            levels_button()
+                            break
+                        case "RESET":
+                            reset_button(count_map)
+                            break
+                        case "QUIT":
+                            done = True
+                            break
+
+        if pg.mouse.get_pressed()[2]:
+            column = pos[0] // (width + margin)
+            row = pos[1] // (height + margin)
+            if (sum(x.count(2) for x in grid)) < 1 or (
+                sum(x.count(3) for x in grid)
+            ) < 1:
+                if (sum(x.count(2) for x in grid)) == 0:
+                    if grid[row][column] == 2:
+                        grid[row][column] = 0
+                    elif grid[row][column] == 3:
+                        grid[row][column] = 0
+                    else:
+                        grid[row][column] = 2
+                        gobalStartPoint = (row, column)
+                else:
+                    if grid[row][column] == 3:
+                        grid[row][column] = 0
+                    elif grid[row][column] == 2:
+                        grid[row][column] = 0
+                    else:
+                        grid[row][column] = 3
+                        gobalEndPoint = (row, column)
+
+            else:
+                if grid[row][column] == 2:
+                    grid[row][column] = 0
+                if grid[row][column] == 3:
+                    grid[row][column] = 0
+                if grid[row][column] == 1:
+                    grid[row][column] = 0
+
+        if pg.mouse.get_pressed()[0]:
+            column = pos[0] // (width + margin)
+            row = pos[1] // (height + margin)
+            if row < 0 or row >= len(grid) or column < 0 or column >= len(grid[0]):
+                continue
+            else:
+                print("left click")
+                grid[row][column] = 1
+
+
 while not done:
     gobalStartPoint
     gobalEndPoint
@@ -751,6 +854,8 @@ while not done:
     uie.draw(screen2)
     uie2 = UIE(925, 350, text=level, font=get_font(20), colour=pg.Color("black"))
     uie2.draw(screen2)
+
+    # handleInput(pg)
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
