@@ -228,7 +228,7 @@ def dijkstra():
             time.sleep(0.1)  # Add a delay to make it slower
 
         if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
+            messagebox.showinfo("Solved", "Finished solving the maze using Dijkstra")
             short_path(came_from, end)
             simulate_dijkstra_process(came_from, start, end, visited)
             return True
@@ -368,7 +368,7 @@ def a_star():
         current = open_set.get()[2]
         open_set_his.remove(current)
         if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
+            messagebox.showinfo("Solved", "Finished solving the maze using A*")
             short_path(came_from, end)
             return True
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
@@ -707,15 +707,6 @@ while not done:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP:
-                user_move("UP")
-            if event.key == pg.K_DOWN:
-                user_move("DOWN")
-            if event.key == pg.K_LEFT:
-                user_move("LEFT")
-            if event.key == pg.K_RIGHT:
-                user_move("RIGHT")
         elif event.type == pg.MOUSEBUTTONDOWN:
             mp_x, mp_y = pg.mouse.get_pos()
             for button in button_list:
