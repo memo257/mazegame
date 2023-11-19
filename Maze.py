@@ -179,6 +179,7 @@ def bfs():
 
         if current not in visited:
             visited.add(current)
+            total_cost += 1
             # Simulation code to visualize the BFS process
             grid[current[0]][current[1]] = 5
             print_grid(grid)  # Function to display the grid (customize as needed)
@@ -254,6 +255,7 @@ def dfs():
         ]
 
         if unvisited_neighbors:
+            random.shuffle(unvisited_neighbors)
             next_neighbor = unvisited_neighbors[0]
             stack.append(next_neighbor)
             came_from[next_neighbor] = current
