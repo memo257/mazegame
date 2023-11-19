@@ -24,7 +24,7 @@ seven = (0, 255, 0)
 
 pygame.init()
 
-size = (706 - 66, 706 - 66)
+size = (706 - 66 - (640 / 34) * 14 + 20, 706 - 66 - (640 / 34) * 14 + 20)
 screen = pygame.display.set_mode(size)
 
 pygame.display.set_caption("DOT GAME")
@@ -33,7 +33,7 @@ width = 20
 height = 20
 margin = 0
 
-grid = [[0 for x in range(33)] for y in range(33)]
+grid = [[0 for x in range(20)] for y in range(20)]
 gobalStartPoint = None
 gobalEndPoint = None
 
@@ -179,7 +179,6 @@ def bfs():
 
         if current not in visited:
             visited.add(current)
-            total_cost += 1
             # Simulation code to visualize the BFS process
             grid[current[0]][current[1]] = 5
             print_grid(grid)  # Function to display the grid (customize as needed)
@@ -334,8 +333,8 @@ def print_grid(grid):
 
     screen.fill(two)
 
-    for row in range(33):
-        for column in range(33):
+    for row in range(20):
+        for column in range(20):
             if grid[row][column] == 1:
                 color = three
             elif grid[row][column] == 2:
@@ -484,7 +483,7 @@ def a_star():
 #                 create_maze(next_x, next_y)
 
 #     # Initialize the maze with walls (1s)
-#     grid = [[1 for _ in range(33)] for _ in range(33)]
+#     grid = [[1 for _ in range(20)] for _ in range(20)]
 
 #     # Make sure the start and end points are valid
 #     start_x, start_y = max(1, min(start_x, 31)), max(1, min(start_y, 31))
@@ -528,7 +527,7 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
                 create_maze(next_x, next_y)
 
     # Initialize the maze with walls (1s)
-    grid = [[1 for _ in range(33)] for _ in range(33)]
+    grid = [[1 for _ in range(20)] for _ in range(20)]
 
     # Make sure the start and end points are valid
     start_x, start_y = max(1, min(start_x, 31)), max(1, min(start_y, 31))
@@ -588,7 +587,7 @@ while not done:
                     # dfs_simulation()
                     # dijkstra()
             if event.key == pygame.K_r:
-                grid = [[0 for x in range(33)] for y in range(33)]
+                grid = [[0 for x in range(20)] for y in range(20)]
 
             if event.key == pygame.K_w:
                 algorithm_index = (algorithm_index + 1) % len(algorithms)
@@ -636,8 +635,8 @@ while not done:
     x = pos[0]
     y = pos[1]
     screen.fill(two)
-    for row in range(33):
-        for column in range(33):
+    for row in range(20):
+        for column in range(20):
             if grid[row][column] == 1:
                 color = three
             elif grid[row][column] == 2:
