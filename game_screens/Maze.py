@@ -616,17 +616,25 @@ def create_buttons():  # create button
 def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
     global algo
     if (sum(x.count(2) for x in grid)) == 1:
-        # if (any(x.count(2) >= 1 for x in grid)):
-        print("Solving")
-        match algo:
-            case "BFS":
-                bfs()
-            case "DFS":
-                dfs()
-            case "A*":
-                a_star()
-            case "DIJKSTRA":
-                dijkstra()
+        # if gobalStartPoint != None and gobalEndPoint != None:
+        if any(element == 2 for row in grid for element in row) and any(
+            element == 3 for row in grid for element in row
+        ):
+            # if (any(x.count(2) >= 1 for x in grid)):
+            print("Solving")
+            match algo:
+                case "BFS":
+                    bfs()
+                case "DFS":
+                    dfs()
+                case "A*":
+                    a_star()
+                case "DIJKSTRA":
+                    dijkstra()
+
+        else:
+            messagebox.showinfo("Error", "Please choose start and end point")
+            print("Please choose start and end point")  #
 
 
 def maps_button():  # this will set the map for the game, every click is a new map
