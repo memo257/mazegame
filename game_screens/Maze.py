@@ -162,6 +162,14 @@ def bfs():
 
     return False
 
+
+def eventHandle():
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit()
+
+
 def dfs():
     global grid, neighbour
     neighbourr()
@@ -173,6 +181,7 @@ def dfs():
     visited = set()
 
     while stack:
+        eventHandle()
         current = stack[-1]
 
         if current == end:
@@ -219,6 +228,7 @@ def dijkstra():
     visited = set()
 
     while open_set:
+        eventHandle()
         _, current = heapq.heappop(open_set)
 
         if current not in visited:
