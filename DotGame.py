@@ -45,7 +45,7 @@ neighbour = []
 algorithm = ""
 
 
-algorithms = ["bfs", "dfs", "a_star", "dijkstra"]
+algorithms = ["bfs", "dfs", "a_star", "dijkstra", "greedy"]
 algorithm_index = 0
 
 
@@ -232,19 +232,30 @@ def dfs():
     came_from = {}
     visited = set()
 
+    vertices_visited = 0  # Counter for vertices visited
+    total_steps = 0  # Counter for total steps
+
     while stack:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
         current = stack[-1]
 
         if current == end:
             print("Finishing - solve by dfs")
             short_path(came_from, end)
+            # print(f"Vertices visited: {vertices_visited}")
+            # print(f"Total steps: {total_steps}")
             return True
 
         if current not in visited:
             visited.add(current)
+
+            vertices_visited += 1  # Increment vertices_visited counter
+
             # Simulation code to visualize the DFS process
             grid[current[0]][current[1]] = 5
-            print_grid(grid)  # Function to display the grid (customize as needed)
+            print_grid(grid)  # Function to display the grid
             time.sleep(0.05)  # Add a delay to make it slower
 
         unvisited_neighbors = [
@@ -254,6 +265,7 @@ def dfs():
         ]
 
         if unvisited_neighbors:
+            total_steps += 1
             random.shuffle(unvisited_neighbors)
             next_neighbor = unvisited_neighbors[0]
             stack.append(next_neighbor)
@@ -350,15 +362,27 @@ def print_grid(grid):
             else:
                 color = four
 
-            pygame.draw.rect(
+            # pygame.draw.rect(
+            #     screen,
+            #     color,
+            #     [
+            #         margin + (margin + width) * column,
+            #         margin + (margin + height) * row,
+            #         width,
+            #         height,
+            #     ],
+            # )
+
+            pygame.draw.circle(
                 screen,
                 color,
-                [
-                    margin + (margin + width) * column,
-                    margin + (margin + height) * row,
-                    width,
-                    height,
-                ],
+                (
+                    int(margin + (margin + width) * column + width / 2),
+                    int(margin + (margin + height) * row + height / 2),
+                ),
+                int(
+                    min(width, height) / 2
+                ),  # Use the smaller of width and height as radius
             )
 
     pygame.display.flip()
@@ -404,6 +428,39 @@ def short_path(came_from, current):
     while current in came_from:
         current = came_from[current]
         grid[current[0]][current[1]] = 4
+
+
+def greedy():
+    global grid, neighbour
+    neighbourr()
+
+    start, end = S_E(grid, 0, 0)
+
+    open_set = PriorityQueue()
+    open_set.put((h(start, end), start))
+    came_from = {}
+    visited = set()
+
+    while not open_set.empty():
+        _, current = open_set.get()
+
+        if current == end:
+            print("Finishing - solve by Greedy")
+            short_path(came_from, end)
+            return True
+
+        if current not in visited:
+            visited.add(current)
+            grid[current[0]][current[1]] = 5  # Mark visited node
+            print_grid(grid)  # Function to display the grid (customize as needed)
+            time.sleep(0.05)  # Add a delay to make it slower
+
+        for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
+            if nei not in visited:
+                open_set.put((h(nei, end), nei))
+                came_from[nei] = current
+
+    return False
 
 
 def a_star():
@@ -581,6 +638,8 @@ while not done:
                         dfs()
                     elif algorithm == "a_star":
                         a_star()
+                    elif algorithm == "greedy":
+                        greedy()
                     # bfs()
                     # a_star()
                     # dfs()
@@ -651,15 +710,27 @@ while not done:
                 color = seven
             else:
                 color = four
-            pygame.draw.rect(
+            # pygame.draw.rect(
+            #     screen,
+            #     color,
+            #     [
+            #         margin + (margin + width) * column,
+            #         margin + (margin + height) * row,
+            #         width,
+            #         height,
+            #     ],
+            # )
+
+            pygame.draw.circle(
                 screen,
                 color,
-                [
-                    margin + (margin + width) * column,
-                    margin + (margin + height) * row,
-                    width,
-                    height,
-                ],
+                (
+                    int(margin + (margin + width) * column + width / 2),
+                    int(margin + (margin + height) * row + height / 2),
+                ),
+                int(
+                    min(width, height) / 2
+                ),  # Use the smaller of width and height as radius
             )
     pygame.display.flip()
     clock.tick(60)
