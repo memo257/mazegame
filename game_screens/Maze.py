@@ -623,7 +623,7 @@ def rd_button():  # this will generate a map between 2 start point and end point
         np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
         print(
-            "Please choose start and end point"
+            "Please choose start and end poin          t"
         )  # if user didn't set the start point and end point, announce them to do that
 
 
