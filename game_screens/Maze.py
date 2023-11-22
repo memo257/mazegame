@@ -133,8 +133,7 @@ def loadgridWithLevel(index, level):
         elif index == 5:
             grid = np.loadtxt(r"./mazemap/Maze14/maze14.txt").tolist()
 
-
-#def startp(maze, i, j):
+    # def startp(maze, i, j):
     for x in range(len(maze[0])):
         try:
             i = maze[x].index(2)
@@ -174,7 +173,11 @@ def bfs():
     return False
 
 
-
+def eventHandle():
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit()
 
 
 def dfs():
@@ -188,6 +191,7 @@ def dfs():
     visited = set()
 
     while stack:
+        eventHandle()
         current = stack[-1]
 
         if current == end:
@@ -220,6 +224,7 @@ def dfs():
 
     return False
 
+
 def dijkstra():
     global grid, neighbour
     neighbourr()
@@ -233,6 +238,7 @@ def dijkstra():
     visited = set()
 
     while open_set:
+        eventHandle()
         _, current = heapq.heappop(open_set)
 
         if current not in visited:
@@ -380,6 +386,8 @@ def a_star():
     f_score[start[0] * len(grid[0]) + start[1]] = h(start, end)
 
     while not open_set.empty():
+        eventHandle()
+
         current = open_set.get()[2]
         open_set_his.remove(current)
         if current == end:
@@ -391,14 +399,12 @@ def a_star():
             if temp_g_score < g_score[nei[0] * len(grid[0]) + nei[1]]:
                 came_from[nei] = current
                 g_score[nei[0] * len(grid[0]) + nei[1]] = temp_g_score
-                f_score[nei[0] * len(grid[0]) + nei[1]
-                        ] = temp_g_score + h(nei, end)
+                f_score[nei[0] * len(grid[0]) + nei[1]] = temp_g_score + h(nei, end)
                 if nei not in open_set_his:
                     count += 1
-                    open_set.put(
-                        (f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
+                    open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
-    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")                
+    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
 
 
@@ -559,7 +565,7 @@ def create_buttons():  # create button
             tcolour=pg.Color("black"),
         )
     )
-    
+
     button_list.append(
         Button(
             870,
@@ -572,8 +578,6 @@ def create_buttons():  # create button
             tcolour=pg.Color("black"),
         )
     )
-
-
 
     for button in button_list:  # draw the buttons
         button.draw(screen2)
@@ -601,7 +605,6 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
             print("Please choose start and end point")  #
 
 
-
 def maps_button():  # this will set the map for the game, every click is a new map
     global count_map
     global level
@@ -617,13 +620,12 @@ def rd_button():  # this will generate a map between 2 start point and end point
     try:
         generate_solvability_maze_with_user_points(
             gobalStartPoint[0], gobalStartPoint[1], gobalEndPoint[0], gobalEndPoint[1]
-
         )
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
         print(
-            "Please choose start and end point"
+            "Please choose start and end poin          t"
         )  # if user didn't set the start point and end point, announce them to do that
 
 
@@ -670,11 +672,19 @@ class Player:
 
         if direction == "UP" and self.row > 0 and maze[self.row - 1][self.col] != 1:
             new_row -= 1
-        elif direction == "DOWN" and self.row < len(maze) - 1 and maze[self.row + 1][self.col] != 1:
+        elif (
+            direction == "DOWN"
+            and self.row < len(maze) - 1
+            and maze[self.row + 1][self.col] != 1
+        ):
             new_row += 1
         elif direction == "LEFT" and self.col > 0 and maze[self.row][self.col - 1] != 1:
             new_col -= 1
-        elif direction == "RIGHT" and self.col < len(maze[0]) - 1 and maze[self.row][self.col + 1] != 1:
+        elif (
+            direction == "RIGHT"
+            and self.col < len(maze[0]) - 1
+            and maze[self.row][self.col + 1] != 1
+        ):
             new_col += 1
 
         # Update the player's position
@@ -722,15 +732,16 @@ def levels_button():  # this will set the level
             grid = [[0 for x in range(block)] for y in range(block)]
             print_grid(grid)
 
+
 def reset_button():
     global grid
     grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
-    
+
+
 gobalStartPoint
 gobalEndPoint
 player = Player((gobalStartPoint))
 while not done:
-
     pos = pg.mouse.get_pos()
     x = pos[0]
     y = pos[1]
@@ -788,18 +799,17 @@ while not done:
                             pg.quit()
                             break
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP :
+            if event.key == pg.K_UP:
                 player.move("UP", grid)
-                
+
             elif event.key == pg.K_DOWN:
                 player.move("DOWN", grid)
-                
+
             elif event.key == pg.K_LEFT:
                 player.move("LEFT", grid)
-                
+
             elif event.key == pg.K_RIGHT:
                 player.move("RIGHT", grid)
-                
 
         if pg.mouse.get_pressed()[2]:
             column = pos[0] // (width + margin)
