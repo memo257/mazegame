@@ -209,6 +209,7 @@ def bfs():
     visited = set()
 
     while not open_set.empty():
+        eventHandle()
         current = open_set.get()
 
         if current == end:
@@ -296,6 +297,7 @@ def greedy():
     visited = set()
 
     while not open_set.empty():
+        eventHandle()
         _, current = open_set.get()
 
         if current == end:
