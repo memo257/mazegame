@@ -226,11 +226,14 @@ def dfs():
     visited = set()
 
     while stack:
+        # Function to handle mouse operations, this will avoid the not responding situation
         eventHandle()
+        # Get the element at the top of the stack
         current = stack[-1]
 
         if current == end:
             messagebox.showinfo("Solved", "Finished solving the maze using DFS")
+            # print the path
             short_path(came_from, end)
             return True
 
@@ -238,9 +241,10 @@ def dfs():
             visited.add(current)
             # Simulation code to visualize the DFS process
             grid[current[0]][current[1]] = 5
-            print_grid(grid)  # Function to display the grid (customize as needed)
+            print_grid(grid)
             time.sleep(0.05)  # Add a delay to make it slower
 
+        # call the function and add unvisited neighbors of current point to unvisited_neighbors[]
         unvisited_neighbors = [
             nei
             for nei in neighbour[current[0] * len(grid[0]) + current[1]]
@@ -248,6 +252,7 @@ def dfs():
         ]
 
         if unvisited_neighbors:
+            # Choose a random neighbor near the current point, then add it to the top of stack
             random.shuffle(unvisited_neighbors)
             next_neighbor = unvisited_neighbors[0]
             stack.append(next_neighbor)
@@ -364,6 +369,7 @@ def print_grid(grid):
 
 def neighbourr():
     global grid, neighbour
+    # Get the all neighbourr of all point in list and store in array
     neighbour = [[] for col in range(len(grid)) for row in range(len(grid))]
     count = 0
     for i in range(len(grid)):
@@ -380,6 +386,7 @@ def neighbourr():
             count += 1
 
 
+# herulics function
 def h(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
@@ -415,6 +422,7 @@ def a_star():
     open_set_his = {start}
     came_from = {}
 
+    # create a set of g score and f score, set g score of start point = 0 and calculate the f point
     g_score = [float("inf") for row in grid for spot in row]
     g_score[start[0] * len(grid[0]) + start[1]] = 0
     f_score = [float("inf") for row in grid for spot in row]
@@ -429,7 +437,9 @@ def a_star():
             messagebox.showinfo("Solved", "Finished solving the maze using A*")
             short_path(came_from, end)
             return True
+        # Go through every neighboir point of current point
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
+            # We go to the neighbor so the g score is increase by one
             temp_g_score = g_score[current[0] * len(grid[0]) + current[1]] + 1
             if temp_g_score < g_score[nei[0] * len(grid[0]) + nei[1]]:
                 came_from[nei] = current
