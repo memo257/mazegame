@@ -924,9 +924,11 @@ while not done:
     if player.has_reached_end(gobalEndPoint) and not reached_endpoint_notification_shown:
         messagebox.showinfo("Congratulations!", "You reached the endpoint!")
         reached_endpoint_notification_shown = True
-        player.has_reached_end(gobalStartPoint)
-        reached_endpoint_notification_shown = False
+        player = Player(gobalStartPoint)
+    if player.get_position() == gobalStartPoint:
+        reached_endpoint_notification_shown = False    
         
+       
     
         
 
