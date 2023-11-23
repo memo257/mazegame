@@ -72,7 +72,8 @@ class Player:
 
     def get_position(self):
         return self.row, self.col
-
+    def has_reached_end(self, end_pos):
+        return (self.row, self.col) == end_pos 
 
 # size - "hard" level of maze; #MAX: 33
 block = 20
@@ -86,7 +87,7 @@ count_level = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = (-1, -1)
-gobalEndPoint = (-1, -1)
+gobalEndPoint = (-2, -2)
 player = Player((gobalStartPoint))
 
 
@@ -472,6 +473,7 @@ def a_star():
 
 def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     global grid
+    #global grid, player_position
 
     def is_valid(x, y):
         return 0 <= x < block and 0 <= y < block
@@ -496,6 +498,7 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
 
     # Initialize the maze with walls (1s)
     grid = [[1 for _ in range(block)] for _ in range(block)]
+    #player_position = [start_x, start_y]
 
     # Make sure the start and end points are valid
     start_x, start_y = max(0, min(start_x, 31)), max(0, min(start_y, 31))
@@ -507,6 +510,7 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     # Mark the start and end points
     grid[start_x][start_y] = 2
     grid[end_x][end_y] = 3
+    #player_position = [start_x, start_y]
 
     # grid[start_x][start_y] = 2
     # grid[end_y][end_x] = 3
@@ -776,6 +780,7 @@ def reset_button():
 gobalStartPoint
 gobalEndPoint
 player = Player((gobalStartPoint))
+reached_endpoint_notification_shown = False
 while not done:
     pos = pg.mouse.get_pos()
     x = pos[0]
@@ -915,6 +920,15 @@ while not done:
                 ],
             )
     draw_player(player.get_position())
+    
+    if player.has_reached_end(gobalEndPoint) and not reached_endpoint_notification_shown:
+        messagebox.showinfo("Congratulations!", "You reached the endpoint!")
+        reached_endpoint_notification_shown = True
+        player.has_reached_end(gobalStartPoint)
+        reached_endpoint_notification_shown = False
+        
+    
+        
 
     # screen.fill((0, 0, 0))
     pg.display.flip()
