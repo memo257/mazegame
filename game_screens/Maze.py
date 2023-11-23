@@ -72,8 +72,10 @@ class Player:
 
     def get_position(self):
         return self.row, self.col
+
     def has_reached_end(self, end_pos):
-        return (self.row, self.col) == end_pos 
+        return (self.row, self.col) == end_pos
+
 
 # size - "hard" level of maze; #MAX: 33
 block = 20
@@ -179,6 +181,7 @@ def loadgridWithLevel(index, level):
         except:
             pass
 
+
 def simulate_bfs_process(visited_nodes, current):
     for node in visited_nodes:
         if node == gobalStartPoint:
@@ -192,6 +195,8 @@ def simulate_bfs_process(visited_nodes, current):
 
     print_grid(grid)
     time.sleep(0.1)
+
+
 def bfs():
     global grid, neighbour
     neighbourr()
@@ -240,11 +245,14 @@ def dfs():
     visited = set()
 
     while stack:
+        # Function to handle mouse operations, this will avoid the not responding situation
         eventHandle()
+        # Get the element at the top of the stack
         current = stack[-1]
 
         if current == end:
             messagebox.showinfo("Solved", "Finished solving the maze using DFS")
+            # print the path
             short_path(came_from, end)
             return True
 
@@ -252,9 +260,10 @@ def dfs():
             visited.add(current)
             # Simulation code to visualize the DFS process
             grid[current[0]][current[1]] = 5
-            print_grid(grid)  # Function to display the grid (customize as needed)
+            print_grid(grid)
             time.sleep(0.05)  # Add a delay to make it slower
 
+        # call the function and add unvisited neighbors of current point to unvisited_neighbors[]
         unvisited_neighbors = [
             nei
             for nei in neighbour[current[0] * len(grid[0]) + current[1]]
@@ -262,6 +271,7 @@ def dfs():
         ]
 
         if unvisited_neighbors:
+            # Choose a random neighbor near the current point, then add it to the top of stack
             random.shuffle(unvisited_neighbors)
             next_neighbor = unvisited_neighbors[0]
             stack.append(next_neighbor)
@@ -270,6 +280,39 @@ def dfs():
             # No unvisited neighbors, backtrack
             stack.pop()
     messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
+
+    return False
+
+
+def greedy():
+    global grid, neighbour
+    neighbourr()
+
+    start, end = S_E(grid, 0, 0)
+
+    open_set = PriorityQueue()
+    open_set.put((h(start, end), start))
+    came_from = {}
+    visited = set()
+
+    while not open_set.empty():
+        _, current = open_set.get()
+
+        if current == end:
+            print("Finishing - solve by Greedy")
+            short_path(came_from, end)
+            return True
+
+        if current not in visited:
+            visited.add(current)
+            grid[current[0]][current[1]] = 5  # Mark visited node
+            print_grid(grid)  # Function to display the grid (customize as needed)
+            time.sleep(0.05)  # Add a delay to make it slower
+
+        for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
+            if nei not in visited:
+                open_set.put((h(nei, end), nei))
+                came_from[nei] = current
 
     return False
 
@@ -378,6 +421,7 @@ def print_grid(grid):
 
 def neighbourr():
     global grid, neighbour
+    # Get the all neighbourr of all point in list and store in array
     neighbour = [[] for col in range(len(grid)) for row in range(len(grid))]
     count = 0
     for i in range(len(grid)):
@@ -394,6 +438,7 @@ def neighbourr():
             count += 1
 
 
+# herulics function
 def h(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
@@ -417,6 +462,7 @@ def short_path(came_from, current):
         current = came_from[current]
         grid[current[0]][current[1]] = 4
 
+
 def simulate_a_star_process(visited_nodes, current):
     for node in visited_nodes:
         if node == gobalStartPoint:
@@ -430,7 +476,8 @@ def simulate_a_star_process(visited_nodes, current):
 
     print_grid(grid)
     time.sleep(0.1)
-    
+
+
 def a_star():
     global grid, neighbour
     neighbourr()
@@ -442,6 +489,7 @@ def a_star():
     open_set_his = {start}
     came_from = {}
 
+    # create a set of g score and f score, set g score of start point = 0 and calculate the f point
     g_score = [float("inf") for row in grid for spot in row]
     g_score[start[0] * len(grid[0]) + start[1]] = 0
     f_score = [float("inf") for row in grid for spot in row]
@@ -456,7 +504,9 @@ def a_star():
             messagebox.showinfo("Solved", "Finished solving the maze using A*")
             short_path(came_from, end)
             return True
+        # Go through every neighboir point of current point
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
+            # We go to the neighbor so the g score is increase by one
             temp_g_score = g_score[current[0] * len(grid[0]) + current[1]] + 1
             if temp_g_score < g_score[nei[0] * len(grid[0]) + nei[1]]:
                 came_from[nei] = current
@@ -473,7 +523,7 @@ def a_star():
 
 def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     global grid
-    #global grid, player_position
+    # global grid, player_position
 
     def is_valid(x, y):
         return 0 <= x < block and 0 <= y < block
@@ -498,7 +548,7 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
 
     # Initialize the maze with walls (1s)
     grid = [[1 for _ in range(block)] for _ in range(block)]
-    #player_position = [start_x, start_y]
+    # player_position = [start_x, start_y]
 
     # Make sure the start and end points are valid
     start_x, start_y = max(0, min(start_x, 31)), max(0, min(start_y, 31))
@@ -510,7 +560,7 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     # Mark the start and end points
     grid[start_x][start_y] = 2
     grid[end_x][end_y] = 3
-    #player_position = [start_x, start_y]
+    # player_position = [start_x, start_y]
 
     # grid[start_x][start_y] = 2
     # grid[end_y][end_x] = 3
@@ -666,6 +716,8 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
                     a_star()
                 case "DIJKSTRA":
                     dijkstra()
+                case "GREEDY":
+                    greedy()
         else:
             messagebox.showinfo("Error", "Please choose start and end point")
             print("Please choose start and end point")  #
@@ -720,11 +772,11 @@ def load_button():  # this will load the game
 
 def algorithms_button():  # this will set the algorithm for algo
     global count_algo, algo
-    algorithms = ["", "BFS", "DFS", "A*", "DIJKSTRA"]
+    algorithms = ["", "BFS", "DFS", "A*", "DIJKSTRA", "GREEDY"]
     count_algo += 1
     if (
-        count_algo > 4
-    ):  # there are 4 algorithms, reach the last one will return to the first one
+        count_algo > 5
+    ):  # there are 5 algorithms, reach the last one will return to the first one
         count_algo = 1
     algo = algorithms[count_algo]
 
@@ -920,17 +972,16 @@ while not done:
                 ],
             )
     draw_player(player.get_position())
-    
-    if player.has_reached_end(gobalEndPoint) and not reached_endpoint_notification_shown:
+
+    if (
+        player.has_reached_end(gobalEndPoint)
+        and not reached_endpoint_notification_shown
+    ):
         messagebox.showinfo("Congratulations!", "You reached the endpoint!")
         reached_endpoint_notification_shown = True
         player = Player(gobalStartPoint)
     if player.get_position() == gobalStartPoint:
-        reached_endpoint_notification_shown = False    
-        
-       
-    
-        
+        reached_endpoint_notification_shown = False
 
     # screen.fill((0, 0, 0))
     pg.display.flip()
