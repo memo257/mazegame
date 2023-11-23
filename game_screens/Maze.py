@@ -42,38 +42,6 @@ mouse_pos = pg.mouse.get_pos()
 
 pg.display.set_caption("MAZE")
 
-
-class Player:
-    def __init__(self, start_pos):
-        self.row, self.col = start_pos
-
-    def move(self, direction, maze):
-        new_row, new_col = self.row, self.col
-
-        if direction == "UP" and self.row > 0 and maze[self.row - 1][self.col] != 1:
-            new_row -= 1
-        elif (
-            direction == "DOWN"
-            and self.row < len(maze) - 1
-            and maze[self.row + 1][self.col] != 1
-        ):
-            new_row += 1
-        elif direction == "LEFT" and self.col > 0 and maze[self.row][self.col - 1] != 1:
-            new_col -= 1
-        elif (
-            direction == "RIGHT"
-            and self.col < len(maze[0]) - 1
-            and maze[self.row][self.col + 1] != 1
-        ):
-            new_col += 1
-
-        # Update the player's position
-        self.row, self.col = new_row, new_col
-
-    def get_position(self):
-        return self.row, self.col
-
-
 # size - "hard" level of maze; #MAX: 33
 block = 20
 
@@ -87,8 +55,6 @@ count_level = 0
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = (-1, -1)
 gobalEndPoint = (-1, -1)
-player = Player((gobalStartPoint))
-
 
 done = False
 clock = pg.time.Clock()
@@ -107,7 +73,6 @@ def savegrid():
     global grid
 
     np.savetxt(r"./maze.txt", grid)
-    # np.savetxt(r"./mazemap/Maze0/maze.txt", grid)
 
 
 def loadgrid(index):
@@ -698,6 +663,37 @@ def algorithms_button():  # this will set the algorithm for algo
     algo = algorithms[count_algo]
 
 
+class Player:
+    def __init__(self, start_pos):
+        self.row, self.col = start_pos
+
+    def move(self, direction, maze):
+        new_row, new_col = self.row, self.col
+
+        if direction == "UP" and self.row > 0 and maze[self.row - 1][self.col] != 1:
+            new_row -= 1
+        elif (
+            direction == "DOWN"
+            and self.row < len(maze) - 1
+            and maze[self.row + 1][self.col] != 1
+        ):
+            new_row += 1
+        elif direction == "LEFT" and self.col > 0 and maze[self.row][self.col - 1] != 1:
+            new_col -= 1
+        elif (
+            direction == "RIGHT"
+            and self.col < len(maze[0]) - 1
+            and maze[self.row][self.col + 1] != 1
+        ):
+            new_col += 1
+
+        # Update the player's position
+        self.row, self.col = new_row, new_col
+
+    def get_position(self):
+        return self.row, self.col
+
+
 def draw_player(player_pos):
     row, col = player_pos
     color = one  # Customize the color of the player
@@ -739,11 +735,7 @@ def levels_button():  # this will set the level
 
 def reset_button():
     global grid
-    # grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
-    grid = np.loadtxt(r"./maze.txt").tolist()
-    global player
-    player = None
-    player = Player(gobalStartPoint)
+    grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
 
 
 gobalStartPoint
