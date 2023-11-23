@@ -178,7 +178,19 @@ def loadgridWithLevel(index, level):
         except:
             pass
 
+def simulate_bfs_process(visited_nodes, current):
+    for node in visited_nodes:
+        if node == gobalStartPoint:
+            grid[node[0]][node[1]] = 2  # Mark start node
+        elif node == gobalEndPoint:
+            grid[node[0]][node[1]] = 3  # Mark end node
+        elif node == current:
+            grid[node[0]][node[1]] = 5  # Mark current node
+        else:
+            grid[node[0]][node[1]] = 6  # Mark other visited nodes
 
+    print_grid(grid)
+    time.sleep(0.1)
 def bfs():
     global grid, neighbour
     neighbourr()
@@ -199,6 +211,7 @@ def bfs():
             return True
 
         visited.add(current)
+        simulate_bfs_process(visited, current)
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
             if nei not in visited:
@@ -403,7 +416,20 @@ def short_path(came_from, current):
         current = came_from[current]
         grid[current[0]][current[1]] = 4
 
+def simulate_a_star_process(visited_nodes, current):
+    for node in visited_nodes:
+        if node == gobalStartPoint:
+            grid[node[0]][node[1]] = 2  # Mark start node
+        elif node == gobalEndPoint:
+            grid[node[0]][node[1]] = 3  # Mark end node
+        elif node == current:
+            grid[node[0]][node[1]] = 5  # Mark current node
+        else:
+            grid[node[0]][node[1]] = 6  # Mark other visited nodes
 
+    print_grid(grid)
+    time.sleep(0.1)
+    
 def a_star():
     global grid, neighbour
     neighbourr()
@@ -439,6 +465,7 @@ def a_star():
                     count += 1
                     open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
+        simulate_a_star_process(open_set_his, current)
     messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
 
