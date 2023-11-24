@@ -11,7 +11,7 @@ import time
 from queue import Queue
 import heapq
 import tkinter as tk
-from sprite_game import Button, UIE
+from sprite_game import Button, UIE, Player
 from tkinter import filedialog
 from tkinter import messagebox
 import pygame_gui
@@ -42,41 +42,6 @@ mouse_pos = pg.mouse.get_pos()
 
 pg.display.set_caption("MAZE")
 
-
-class Player:
-    def __init__(self, start_pos):
-        self.row, self.col = start_pos
-
-    def move(self, direction, maze):
-        new_row, new_col = self.row, self.col
-
-        if direction == "UP" and self.row > 0 and maze[self.row - 1][self.col] != 1:
-            new_row -= 1
-        elif (
-            direction == "DOWN"
-            and self.row < len(maze) - 1
-            and maze[self.row + 1][self.col] != 1
-        ):
-            new_row += 1
-        elif direction == "LEFT" and self.col > 0 and maze[self.row][self.col - 1] != 1:
-            new_col -= 1
-        elif (
-            direction == "RIGHT"
-            and self.col < len(maze[0]) - 1
-            and maze[self.row][self.col + 1] != 1
-        ):
-            new_col += 1
-
-        # Update the player's position
-        self.row, self.col = new_row, new_col
-
-    def get_position(self):
-        return self.row, self.col
-
-    def has_reached_end(self, end_pos):
-        return (self.row, self.col) == end_pos
-
-
 # size - "hard" level of maze; #MAX: 33
 block = 20
 
@@ -86,10 +51,12 @@ margin = 2
 count = 0
 count_algo = 1
 count_level = 0
+count_map = 0
+check_ng = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = (-1, -1)
-gobalEndPoint = (-2, -2)
+gobalEndPoint = None
 player = Player((gobalStartPoint))
 
 
@@ -171,7 +138,7 @@ def loadgridWithLevel(index, level):
         elif index == 5:
             grid = np.loadtxt(r"./mazemap/Maze14/maze14.txt").tolist()
 
-    # def startp(maze, i, j):
+def startp(maze, i, j):
     for x in range(len(maze[0])):
         try:
             i = maze[x].index(2)
@@ -744,14 +711,13 @@ def rd_button():  # this will generate a map between 2 start point and end point
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
-        print(
-            "Please choose start and end poin          t"
-        )  # if user didn't set the start point and end point, announce them to do that
+        messagebox.showinfo("Error", "Please choose start and end point")  # if user didn't set the start point and end point, announce them to do that
 
 
 def ng_buttom():  # this will erase everything on the grid and set it to the initial grid
     global grid
     grid = [[0 for x in range(block)] for y in range(block)]
+    savegrid()
 
 
 def save_button():  # this will save the game
@@ -822,9 +788,12 @@ def levels_button():  # this will set the level
             print_grid(grid)
 
 
-def reset_button():
-    global grid
+def reset_button(): #reset no dang ko set duoc cai neu m nhan nut new game a
+    global grid, check_ng
     # grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
+    '''if check_ng == 1:
+        grid = [[0 for x in range(block)] for y in range(block)]
+    else: '''
     grid = np.loadtxt(r"./maze.txt").tolist()
     global player
     player = None
@@ -834,7 +803,6 @@ def reset_button():
 gobalStartPoint
 gobalEndPoint
 player = Player((gobalStartPoint))
-reached_endpoint_notification_shown = False
 while not done:
     pos = pg.mouse.get_pos()
     x = pos[0]
@@ -871,6 +839,7 @@ while not done:
                             rd_button()
                             break
                         case "NEW GAME":
+                            check_ng = 1
                             ng_buttom()
                             break
                         case "SAVE":
@@ -889,8 +858,7 @@ while not done:
                             reset_button()
                             break
                         case "QUIT":
-                            print("Exit")
-                            pg.quit()
+                            done = True
                             break
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_UP:
@@ -981,6 +949,7 @@ while not done:
     ):
         messagebox.showinfo("Congratulations!", "You reached the endpoint!")
         reached_endpoint_notification_shown = True
+        gobalStartPoint = (-1, -1)
         player = Player(gobalStartPoint)
     if player.get_position() == gobalStartPoint:
         reached_endpoint_notification_shown = False
