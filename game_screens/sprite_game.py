@@ -32,3 +32,36 @@ class UIE: #design the text
         self.font_size = font.size(self.text)
         text = font.render(self.text, True, self.colour)
         screen.blit(text, (self.x, self.y))
+        
+class Player:
+    def __init__(self, start_pos):
+        self.row, self.col = start_pos
+
+    def move(self, direction, maze):
+        new_row, new_col = self.row, self.col
+
+        if direction == "UP" and self.row > 0 and maze[self.row - 1][self.col] != 1:
+            new_row -= 1
+        elif (
+            direction == "DOWN"
+            and self.row < len(maze) - 1
+            and maze[self.row + 1][self.col] != 1
+        ):
+            new_row += 1
+        elif direction == "LEFT" and self.col > 0 and maze[self.row][self.col - 1] != 1:
+            new_col -= 1
+        elif (
+            direction == "RIGHT"
+            and self.col < len(maze[0]) - 1
+            and maze[self.row][self.col + 1] != 1
+        ):
+            new_col += 1
+
+        # Update the player's position
+        self.row, self.col = new_row, new_col
+
+    def get_position(self):
+        return self.row, self.col
+
+    def has_reached_end(self, end_pos):
+        return (self.row, self.col) == end_pos
