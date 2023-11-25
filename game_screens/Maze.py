@@ -180,14 +180,17 @@ def bfs():
                 open_set.put(nei)
                 came_from[nei] = current
 
-                grid[current[0]][current[1]] = 5
-                print_grid(grid)
-                time.sleep(0.05)  # Add a delay to make it slower
+                # grid[current[0]][current[1]] = 5
+                # print_grid(grid)
+                # time.sleep(0.05)  # Add a delay to make it slower
 
                 if nei == end:
                     messagebox.showinfo("Solved", "Finished solving the maze using BFS")
                     short_path(came_from, end)
                     return True
+        grid[current[0]][current[1]] = 5
+        print_grid(grid)
+        time.sleep(0.05)  # Add a delay to make it slower
 
     messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
