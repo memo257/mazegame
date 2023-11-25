@@ -33,7 +33,7 @@ class UIE: #design the text
         text = font.render(self.text, True, self.colour)
         screen.blit(text, (self.x, self.y))
         
-class Player:
+class Player: #setup movement for player
     def __init__(self, start_pos):
         self.row, self.col = start_pos
 
