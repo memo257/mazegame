@@ -708,8 +708,17 @@ def rd_button():  # this will generate a map between 2 start point and end point
 
 def ng_buttom():  # this will erase everything on the grid and set it to the initial grid
     global grid
+    global gobalStartPoint, gobalEndPoint
     grid = [[0 for x in range(block)] for y in range(block)]
     savegrid()
+
+    gobalStartPoint = (-1, -1)
+    gobalEndPoint = None
+
+    # reset tol default
+    global player
+    player = None
+    player = Player(gobalStartPoint)
 
 
 def save_button():  # this will save the game
@@ -785,13 +794,16 @@ def levels_button():  # this will set the level
 def reset_button():  # reset no dang ko set duoc cai neu m nhan nut new game a
     global grid, check_ng
     # grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
+
     """if check_ng == 1:
         grid = [[0 for x in range(block)] for y in range(block)]
     else: """
+
     grid = np.loadtxt(r"./maze.txt").tolist()
-    global player
-    player = None
-    player = Player(gobalStartPoint)
+
+    # global player
+    # player = None
+    # player = Player(gobalStartPoint)
 
 
 gobalStartPoint
@@ -855,6 +867,7 @@ while not done:
                             done = True
                             break
         elif event.type == pg.KEYDOWN:
+            savegrid()  # save map after moving
             if event.key == pg.K_UP:
                 player.move("UP", grid)
 
@@ -943,7 +956,7 @@ while not done:
     ):
         messagebox.showinfo("Congratulations!", "You reached the endpoint!")
         reached_endpoint_notification_shown = True
-        gobalStartPoint = (-1, -1)
+        # gobalStartPoint = (-1, -1)
         player = Player(gobalStartPoint)
     if player.get_position() == gobalStartPoint:
         reached_endpoint_notification_shown = False
