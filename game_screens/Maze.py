@@ -138,6 +138,7 @@ def loadgridWithLevel(index, level):
         elif index == 5:
             grid = np.loadtxt(r"./mazemap/Maze14/maze14.txt").tolist()
 
+
 def startp(maze, i, j):
     for x in range(len(maze[0])):
         try:
@@ -147,9 +148,6 @@ def startp(maze, i, j):
             return i, j
         except:
             pass
-
-
-
 
 
 def bfs():
@@ -167,28 +165,33 @@ def bfs():
         eventHandle()
         current = open_set.get()
 
-        '''if current == end:
+        """if current == end:
             messagebox.showinfo("Solved", "Finished solving the maze using BFS")
             short_path(came_from, end)
-            return True'''
+            return True"""
 
         visited.add(current)
-        #simulate_bfs_process(visited, current)
+        # simulate_bfs_process(visited, current)
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
             if nei not in visited:
+                visited.add(nei)  # fix slow
+
                 open_set.put(nei)
                 came_from[nei] = current
-                
-                grid[nei[0]][nei[1]] = 5  # Mark visited nodes
-                print_grid(grid)
-                time.sleep(0.01)
-                
+
+                # grid[current[0]][current[1]] = 5
+                # print_grid(grid)
+                # time.sleep(0.05)  # Add a delay to make it slower
+
                 if nei == end:
                     messagebox.showinfo("Solved", "Finished solving the maze using BFS")
                     short_path(came_from, end)
                     return True
-                
+        grid[current[0]][current[1]] = 5
+        print_grid(grid)
+        time.sleep(0.05)  # Add a delay to make it slower
+
     messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
 
@@ -430,8 +433,6 @@ def short_path(came_from, current):
         grid[current[0]][current[1]] = 4
 
 
-
-
 def a_star():
     global grid, neighbour
     neighbourr()
@@ -457,7 +458,7 @@ def a_star():
         grid[current[0]][current[1]] = 5  # Mark visited nodes
         print_grid(grid)
         time.sleep(0.05)
-        
+
         if current == end:
             messagebox.showinfo("Solved", "Finished solving the maze using A*")
             short_path(came_from, end)
@@ -474,7 +475,7 @@ def a_star():
                     count += 1
                     open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
-        
+
     messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
     return False
 
@@ -700,7 +701,9 @@ def rd_button():  # this will generate a map between 2 start point and end point
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
-        messagebox.showinfo("Error", "Please choose start and end point")  # if user didn't set the start point and end point, announce them to do that
+        messagebox.showinfo(
+            "Error", "Please choose start and end point"
+        )  # if user didn't set the start point and end point, announce them to do that
 
 
 def ng_buttom():  # this will erase everything on the grid and set it to the initial grid
@@ -725,6 +728,8 @@ def load_button():  # this will load the game
         grid = np.genfromtxt(file_path, dtype=float, invalid_raise=False)
         grid = np.nan_to_num(grid, nan=0.0)  # Replace NaN values with 0.0
         grid = grid.astype(np.float64)
+        np.savetxt("./maze.txt", grid)
+        grid = np.loadtxt(r"./maze.txt").tolist()
 
 
 def algorithms_button():  # this will set the algorithm for algo
@@ -777,12 +782,12 @@ def levels_button():  # this will set the level
             print_grid(grid)
 
 
-def reset_button(): #reset no dang ko set duoc cai neu m nhan nut new game a
+def reset_button():  # reset no dang ko set duoc cai neu m nhan nut new game a
     global grid, check_ng
     # grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
-    '''if check_ng == 1:
+    """if check_ng == 1:
         grid = [[0 for x in range(block)] for y in range(block)]
-    else: '''
+    else: """
     grid = np.loadtxt(r"./maze.txt").tolist()
     global player
     player = None
