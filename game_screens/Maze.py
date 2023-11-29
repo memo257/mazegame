@@ -11,7 +11,7 @@ import time
 from queue import Queue
 import heapq
 import tkinter as tk
-from sprite_game import Button, UIE, Player
+from sprite_game import Button, UIE
 from tkinter import filedialog
 from tkinter import messagebox
 import pygame_gui
@@ -55,9 +55,9 @@ count_map = 0
 check_ng = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
-gobalStartPoint = (-1, -1)
+gobalStartPoint = None
 gobalEndPoint = None
-player = Player((gobalStartPoint))
+
 
 
 done = False
@@ -784,14 +784,14 @@ def reset_button(): #reset no dang ko set duoc cai neu m nhan nut new game a
         grid = [[0 for x in range(block)] for y in range(block)]
     else: '''
     grid = np.loadtxt(r"./maze.txt").tolist()
-    global player
-    player = None
-    player = Player(gobalStartPoint)
+    #global player
+    #player = None
+    #player = Player(gobalStartPoint)
 
 
 gobalStartPoint
 gobalEndPoint
-player = Player((gobalStartPoint))
+#player = Player((gobalStartPoint))
 while not done:
     pos = pg.mouse.get_pos()
     x = pos[0]
@@ -876,7 +876,7 @@ while not done:
                     else:
                         grid[row][column] = 2
                         gobalStartPoint = (row, column)
-                        player = Player(gobalStartPoint)
+                        
 
                 else:
                     if grid[row][column] == 3:
@@ -930,18 +930,7 @@ while not done:
                     height,
                 ],
             )
-    draw_player(player.get_position())
 
-    if (
-        player.has_reached_end(gobalEndPoint)
-        and not reached_endpoint_notification_shown
-    ):
-        messagebox.showinfo("Congratulations!", "You reached the endpoint!")
-        reached_endpoint_notification_shown = True
-        gobalStartPoint = (-1, -1)
-        player = Player(gobalStartPoint)
-    if player.get_position() == gobalStartPoint:
-        reached_endpoint_notification_shown = False
 
     # screen.fill((0, 0, 0))
     pg.display.flip()
