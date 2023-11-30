@@ -11,19 +11,18 @@ import time
 from queue import Queue
 import heapq
 import tkinter as tk
-from sprite_game import Button, UIE, Player
+from sprite_game import Button, UIE
 from tkinter import filedialog
-from tkinter import messagebox
-import pygame_gui
 
 # colors
 one = (79, 189, 186)  # player
 two = (206, 171, 147)  # wall
 three = (227, 202, 165)
 four = (255, 251, 233)
-five = (246, 137, 137)
+five = (246, 137, 137) #destination
 six = (255, 0, 0)
 seven = (0, 255, 0)
+eight = (172, 243, 157)
 Mindaro = "#C5D86D"
 Black = "#fff"
 
@@ -37,6 +36,7 @@ screen1 = pg.display.set_mode(screen1_size)
 screen2 = pg.display.set_mode(screen2_size)
 screen = pg.display.set_mode(size, pg.RESIZABLE)
 
+screen2_pos = (470, 729)
 width, height = screen.get_size()
 mouse_pos = pg.mouse.get_pos()
 
@@ -49,16 +49,15 @@ width = 20
 height = 20
 margin = 2
 count = 0
+#flags
 count_algo = 1
 count_level = 0
 count_map = 0
-check_ng = 0
+isReset = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
-gobalStartPoint = (-1, -1)
+gobalStartPoint = None
 gobalEndPoint = None
-player = Player((gobalStartPoint))
-
 
 done = False
 clock = pg.time.Clock()
@@ -68,6 +67,9 @@ button_list = []
 line_list = []
 algo = "BFS"
 level = "EASY"
+answer = ""
+path = ""
+node_visit = ""
 
 root = tk.Tk()
 root.withdraw()
@@ -75,9 +77,7 @@ root.withdraw()
 
 def savegrid():
     global grid
-
     np.savetxt(r"./maze.txt", grid)
-    # np.savetxt(r"./mazemap/Maze0/maze.txt", grid)
 
 
 def loadgrid(index):
@@ -151,7 +151,7 @@ def startp(maze, i, j):
 
 
 def bfs():
-    global grid, neighbour
+    global grid, neighbour, answer, isReset, path, node_visit
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
@@ -164,35 +164,25 @@ def bfs():
     while not open_set.empty():
         eventHandle()
         current = open_set.get()
-
-        """if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using BFS")
-            short_path(came_from, end)
-            return True"""
-
         visited.add(current)
         # simulate_bfs_process(visited, current)
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
             if nei not in visited:
                 visited.add(nei)  # fix slow
-
                 open_set.put(nei)
                 came_from[nei] = current
-
-                # grid[current[0]][current[1]] = 5
-                # print_grid(grid)
-                # time.sleep(0.05)  # Add a delay to make it slower
-
                 if nei == end:
-                    messagebox.showinfo("Solved", "Finished solving the maze using BFS")
-                    short_path(came_from, end)
+                    answer = "Finished - solve by BFS"
+                    path = f"Approved nodes: {short_path(came_from, end)} nodes"
+                    node_visit = f"Visited nodes: {len(visited)} nodes"
+                    isReset = 1
                     return True
         grid[current[0]][current[1]] = 5
         print_grid(grid)
         time.sleep(0.05)  # Add a delay to make it slower
 
-    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
+    answer = "There is no path to reach the endpoint."
     return False
 
 
@@ -204,7 +194,7 @@ def eventHandle():
 
 
 def dfs():
-    global grid, neighbour
+    global grid, neighbour, answer, isReset, path, node_visit
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
@@ -220,9 +210,10 @@ def dfs():
         current = stack[-1]
 
         if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using DFS")
-            # print the path
-            short_path(came_from, end)
+            answer = "Finished - solve by DFS"
+            node_visit = f"Visited nodes: {len(visited)} nodes"
+            path = f"Approved nodes: {short_path(came_from, end)} nodes"
+            isReset = 1
             return True
 
         if current not in visited:
@@ -248,17 +239,17 @@ def dfs():
         else:
             # No unvisited neighbors, backtrack
             stack.pop()
-    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
+    answer = "There is no path to reach the endpoint."
 
     return False
 
 
 def greedy():
-    global grid, neighbour
+    global grid, neighbour, answer, isReset, path, node_visit
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
-
+    count = 0
     open_set = PriorityQueue()
     open_set.put((h(start, end), start))
     came_from = {}
@@ -269,26 +260,31 @@ def greedy():
         _, current = open_set.get()
 
         if current == end:
-            print("Finishing - solve by Greedy")
-            short_path(came_from, end)
+            answer = "Finished - solve by Greedy"
+            node_visit = f"Visited nodes: {count} nodes"
+            path = f"Approved nodes: {short_path(came_from, end)} nodes"
+            isReset = 1
             return True
-
+        
         if current not in visited:
             visited.add(current)
+            #count += 1
             grid[current[0]][current[1]] = 5  # Mark visited node
             print_grid(grid)  # Function to display the grid (customize as needed)
             time.sleep(0.05)  # Add a delay to make it slower
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
             if nei not in visited:
+                count += 1 #count the visited node
                 open_set.put((h(nei, end), nei))
                 came_from[nei] = current
-
+        
+    answer = "There is no path to reach the endpoint."
     return False
 
 
 def dijkstra():
-    global grid, neighbour
+    global grid, neighbour, answer, isReset, path, node_visit
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
@@ -311,9 +307,11 @@ def dijkstra():
             time.sleep(0.1)  # Add a delay to make it slower
 
         if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using Dijkstra")
-            short_path(came_from, end)
+            answer = "Finished - solve by Dijkstra"
+            node_visit = f"Visited nodes: {len(visited)} nodes"
+            path = f"Approved nodes: {short_path(came_from, end)} nodes"
             simulate_dijkstra_process(came_from, start, end, visited)
+            isReset = 1
             return True
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
@@ -323,7 +321,7 @@ def dijkstra():
                 priority = new_cost
                 heapq.heappush(open_set, (priority, nei))
                 came_from[nei] = current
-    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
+    answer = "There is no path to reach the endpoint."
 
     return False
 
@@ -369,7 +367,7 @@ def print_grid(grid):
             elif grid[row][column] == 4:
                 color = one
             elif grid[row][column] == 5:
-                color = six
+                color = seven
             elif grid[row][column] == 6:
                 color = seven
             else:
@@ -427,14 +425,17 @@ def S_E(maze, start, end):
 
 
 def short_path(came_from, current):
+    count = 1
     grid[current[0]][current[1]] = 4
     while current in came_from:
         current = came_from[current]
         grid[current[0]][current[1]] = 4
+        count += 1
+    return count
 
 
 def a_star():
-    global grid, neighbour
+    global grid, neighbour, answer, isReset, path, node_visit
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
@@ -452,7 +453,6 @@ def a_star():
 
     while not open_set.empty():
         eventHandle()
-
         current = open_set.get()[2]
         open_set_his.remove(current)
         grid[current[0]][current[1]] = 5  # Mark visited nodes
@@ -460,8 +460,10 @@ def a_star():
         time.sleep(0.05)
 
         if current == end:
-            messagebox.showinfo("Solved", "Finished solving the maze using A*")
-            short_path(came_from, end)
+            answer = "Finished - solve by A*"
+            node_visit = f"Visited nodes: {count} nodes"
+            path = f"Approved nodes: {short_path(came_from, end)} nodes"
+            isReset = 1
             return True
         # Go through every neighboir point of current point
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
@@ -476,13 +478,12 @@ def a_star():
                     open_set.put((f_score[nei[0] * len(grid[0]) + nei[1]], count, nei))
                     open_set_his.add(nei)
 
-    messagebox.showinfo("No Path Found", "There is no path to reach the endpoint.")
+    answer = "There is no path to reach the endpoint."
     return False
 
 
 def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     global grid
-    # global grid, player_position
 
     def is_valid(x, y):
         return 0 <= x < block and 0 <= y < block
@@ -507,7 +508,6 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
 
     # Initialize the maze with walls (1s)
     grid = [[1 for _ in range(block)] for _ in range(block)]
-    # player_position = [start_x, start_y]
 
     # Make sure the start and end points are valid
     start_x, start_y = max(0, min(start_x, 31)), max(0, min(start_y, 31))
@@ -519,7 +519,6 @@ def generate_solvability_maze_with_user_points(start_x, start_y, end_x, end_y):
     # Mark the start and end points
     grid[start_x][start_y] = 2
     grid[end_x][end_y] = 3
-    # player_position = [start_x, start_y]
 
     # grid[start_x][start_y] = 2
     # grid[end_y][end_x] = 3
@@ -535,7 +534,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            50,
+            20,
             120,
             60,
             "PLAY",
@@ -547,7 +546,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            50,
+            20,
             120,
             60,
             "MAPS",
@@ -559,7 +558,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            120,
+            90,
             120,
             60,
             "RANDOM",
@@ -571,7 +570,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            120,
+            90,
             120,
             60,
             "NEW GAME",
@@ -583,7 +582,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            190,
+            160,
             120,
             60,
             "SAVE",
@@ -595,7 +594,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             925,
-            190,
+            160,
             120,
             60,
             "LOAD",
@@ -607,7 +606,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            260,
+            230,
             120,
             60,
             "ALGORITHMS",
@@ -619,7 +618,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            330,
+            300,
             120,
             60,
             "LEVELS",
@@ -631,7 +630,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             800,
-            400,
+            370,
             120,
             60,
             "RESET",
@@ -644,7 +643,7 @@ def create_buttons():  # create button
     button_list.append(
         Button(
             870,
-            650,
+            660,
             120,
             60,
             "QUIT",
@@ -659,7 +658,7 @@ def create_buttons():  # create button
 
 
 def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DIJKSTRA, based on the global variable algo
-    global algo
+    global algo, answer
     savegrid()
     if (sum(x.count(2) for x in grid)) == 1:
         if any(element == 2 for row in grid for element in row) and any(
@@ -678,21 +677,21 @@ def play_button():  # this will check the algo, whether it is BFS, DFS, A* or DI
                 case "GREEDY":
                     greedy()
         else:
-            messagebox.showinfo("Error", "Please choose start and end point")
-            print("Please choose start and end point")  #
+            answer = "Please choose start and end point"
+    else:
+        answer = "Please choose start and end point"
 
 
 def maps_button():  # this will set the map for the game, every click is a new map
-    global count_map
-    global level
+    global count_map, level
     count_map += 1
     if count_map > 5:  # 5 maps in total, reach 5 then return to 1
         count_map = 1
-    # loadgrid(count_map)
     loadgridWithLevel(count_map, level)
 
 
 def rd_button():  # this will generate a map between 2 start point and end point
+    global answer
     print("Creating and loading a random maze")
     try:
         generate_solvability_maze_with_user_points(
@@ -701,9 +700,7 @@ def rd_button():  # this will generate a map between 2 start point and end point
         savegrid()  # Save the generated maze
         np.savetxt(r"./maze.txt", grid)  # Load the generated maze
     except:
-        messagebox.showinfo(
-            "Error", "Please choose start and end point"
-        )  # if user didn't set the start point and end point, announce them to do that
+        answer = "Please choose start and end point" # if user didn't set the start point and end point, announce them to do that
 
 
 def ng_buttom():  # this will erase everything on the grid and set it to the initial grid
@@ -712,14 +709,8 @@ def ng_buttom():  # this will erase everything on the grid and set it to the ini
     grid = [[0 for x in range(block)] for y in range(block)]
     savegrid()
 
-    gobalStartPoint = (-1, -1)
+    gobalStartPoint = None
     gobalEndPoint = None
-
-    # reset tol default
-    global player
-    player = None
-    player = Player(gobalStartPoint)
-
 
 def save_button():  # this will save the game
     file_path = filedialog.asksaveasfilename(defaultextension=".txt")
@@ -751,22 +742,6 @@ def algorithms_button():  # this will set the algorithm for algo
         count_algo = 1
     algo = algorithms[count_algo]
 
-
-def draw_player(player_pos):
-    row, col = player_pos
-    color = one  # Customize the color of the player
-    pg.draw.rect(
-        screen1,
-        color,
-        [
-            margin + (margin + width) * col,
-            margin + (margin + height) * row,
-            width,
-            height,
-        ],
-    )
-
-
 def levels_button():  # this will set the level
     global count_level, level, block, grid
     levels = ["EASY", "INTERMEDIATE", "HARD"]
@@ -792,23 +767,25 @@ def levels_button():  # this will set the level
 
 
 def reset_button():  # reset no dang ko set duoc cai neu m nhan nut new game a
-    global grid, check_ng
-    # grid = np.loadtxt(r"./mazemap/Maze0/maze.txt").tolist()
-
-    """if check_ng == 1:
-        grid = [[0 for x in range(block)] for y in range(block)]
-    else: """
-
+    global grid
     grid = np.loadtxt(r"./maze.txt").tolist()
-
-    # global player
-    # player = None
-    # player = Player(gobalStartPoint)
-
+    
+def text_output():
+    global algo, level, answer, path, node_visit
+    uie_algo = UIE(925, 250, text=algo, font=get_font(20), colour=pg.Color("black"), width=200)
+    uie_algo.draw(screen2)
+    uie_level = UIE(925, 320, text=level, font=get_font(20), colour=pg.Color("black"), width=200)
+    uie_level.draw(screen2)
+    uie_answer = UIE(800, 480, text=answer, font=get_font(20), colour=pg.Color("black"), width=300)
+    uie_answer.draw(screen2)
+    uie_node = UIE(800, 510, text=node_visit, font=get_font(20), colour=pg.Color("black"), width=300)
+    uie_node.draw(screen2)
+    uie_path = UIE(800, 540, text=path, font=get_font(20), colour=pg.Color("black"), width=300)
+    uie_path.draw(screen2)
 
 gobalStartPoint
 gobalEndPoint
-player = Player((gobalStartPoint))
+
 while not done:
     pos = pg.mouse.get_pos()
     x = pos[0]
@@ -821,12 +798,9 @@ while not done:
     pg.display.get_surface().blit(screen2, (screen1.get_width(), 0))
     # Create the buttons
     create_buttons()
-
-    uie = UIE(925, 280, text=algo, font=get_font(20), colour=pg.Color("black"))
-    uie.draw(screen2)
-    uie2 = UIE(925, 350, text=level, font=get_font(20), colour=pg.Color("black"))
-    uie2.draw(screen2)
-
+    # Create the text
+    text_output()
+    
     for event in pg.event.get():
         if event.type == pg.QUIT:
             done = True
@@ -836,17 +810,29 @@ while not done:
                 if button.click(mp_x, mp_y):
                     match button.text:
                         case "PLAY":
-                            play_button()
+                            if isReset == 0:
+                                play_button()
+                            else: 
+                                answer = "Please click the reset button"
+                                path = ""
+                                node_visit = ""
                             break
                         case "MAPS":
+                            isReset = 0
+                            answer = ""
+                            path = ""
+                            node_visit = ""
                             maps_button()
                             break
                         case "RANDOM":
                             rd_button()
                             break
                         case "NEW GAME":
-                            check_ng = 1
                             ng_buttom()
+                            isReset = 0
+                            answer = ""
+                            path = ""
+                            node_visit = ""
                             break
                         case "SAVE":
                             save_button()
@@ -861,25 +847,16 @@ while not done:
                             levels_button()
                             break
                         case "RESET":
+                            isReset = 0
                             reset_button()
+                            answer = ""
+                            path = ""
+                            node_visit = ""
                             break
                         case "QUIT":
                             done = True
                             break
-        elif event.type == pg.KEYDOWN:
-            savegrid()  # save map after moving
-            if event.key == pg.K_UP:
-                player.move("UP", grid)
-
-            elif event.key == pg.K_DOWN:
-                player.move("DOWN", grid)
-
-            elif event.key == pg.K_LEFT:
-                player.move("LEFT", grid)
-
-            elif event.key == pg.K_RIGHT:
-                player.move("RIGHT", grid)
-
+        
         if pg.mouse.get_pressed()[2]:
             column = pos[0] // (width + margin)
             row = pos[1] // (height + margin)
@@ -894,7 +871,7 @@ while not done:
                     else:
                         grid[row][column] = 2
                         gobalStartPoint = (row, column)
-                        player = Player(gobalStartPoint)
+                        
 
                 else:
                     if grid[row][column] == 3:
@@ -933,7 +910,7 @@ while not done:
             elif grid[row][column] == 4:
                 color = one
             elif grid[row][column] == 5:
-                color = six
+                color = seven
             elif grid[row][column] == 6:
                 color = seven
             else:
@@ -948,19 +925,7 @@ while not done:
                     height,
                 ],
             )
-    draw_player(player.get_position())
-
-    if (
-        player.has_reached_end(gobalEndPoint)
-        and not reached_endpoint_notification_shown
-    ):
-        messagebox.showinfo("Congratulations!", "You reached the endpoint!")
-        reached_endpoint_notification_shown = True
-        # gobalStartPoint = (-1, -1)
-        player = Player(gobalStartPoint)
-    if player.get_position() == gobalStartPoint:
-        reached_endpoint_notification_shown = False
-
+            
     # screen.fill((0, 0, 0))
     pg.display.flip()
     clock.tick(60)
