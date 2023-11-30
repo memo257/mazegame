@@ -156,7 +156,7 @@ def bfs():
     neighbourr()
 
     start, end = S_E(grid, 0, 0)
-
+    end_final = end
     open_set = Queue()
     open_set.put(start)
     came_from = {}
@@ -339,7 +339,7 @@ def simulate_dijkstra_process(came_from, start, end, visited):
     # Mark the solution path and print it
     for node in visited:
         if node == start:
-            grid[node[0]][node[1]] = 2  # Mark start node
+            grid[node[0]][node[1]] = 3  # Mark start node
         elif node == end:
             grid[node[0]][node[1]] = 3  # Mark end node
         elif node in path:
@@ -347,8 +347,6 @@ def simulate_dijkstra_process(came_from, start, end, visited):
         else:
             grid[node[0]][node[1]] = 6  # Mark other visited nodes
 
-    print("Solution Path:")
-    print(path)
 
 
 def print_grid(grid):
@@ -427,10 +425,13 @@ def S_E(maze, start, end):
 
 def short_path(came_from, current):
     count = 1
-    grid[current[0]][current[1]] = 4
+    grid[current[0]][current[1]] = 3 #end node
     while current in came_from:
         current = came_from[current]
-        grid[current[0]][current[1]] = 4
+        if current not in came_from:  
+            grid[current[0]][current[1]] = 3 #start node
+        else:
+            grid[current[0]][current[1]] = 4
         count += 1
     return count
 
