@@ -781,7 +781,7 @@ def text_output():
     uie_node = UIE(800, 510, text=node_visit, font=get_font(20), colour=pg.Color("black"), width=300)
     uie_node.draw(screen2)
     uie_path = UIE(800, 540, text=path, font=get_font(20), colour=pg.Color("black"), width=300)
-    uie_path.draw(screen2)
+    uie_path.draw(screen2) 
 
 gobalStartPoint
 gobalEndPoint
