@@ -21,17 +21,37 @@ class Button: #design the button
         return self.x <= mouce_x <= self.x + self.width and self.y <= mouce_y <= self.y + self.height
     
 class UIE: #design the text 
-    def __init__(self, x, y, text, font, colour):
+    def __init__(self, x, y, text, font, colour, width):
         self.x, self.y = x, y
         self.text = text
         self.font = font
         self.colour = colour
-        
+        self.width = width
+
+    def wrap_text(self):
+        words = self.text.split(' ')
+        lines = []
+        current_line = []
+        current_width = 0
+
+        for word in words:
+            word_width, _ = self.font.size(word + ' ')
+            if current_width + word_width <= self.width:
+                current_line.append(word)
+                current_width += word_width
+            else:
+                lines.append(' '.join(current_line))
+                current_line = [word]
+                current_width = word_width
+
+        lines.append(' '.join(current_line))
+        return lines
+
     def draw(self, screen):
-        font = self.font
-        self.font_size = font.size(self.text)
-        text = font.render(self.text, True, self.colour)
-        screen.blit(text, (self.x, self.y))
+        lines = self.wrap_text()
+        for i, line in enumerate(lines):
+            text = self.font.render(line, True, self.colour)
+            screen.blit(text, (self.x, self.y + i * self.font.get_height()))
         
 class Player: #setup movement for player
     def __init__(self, start_pos):
