@@ -740,8 +740,8 @@ def algorithms_button():  # this will set the algorithm for algo
         count_algo > 5
     ):  # there are 5 algorithms, reach the last one will return to the first one
         count_algo = 1
-    algo = algorithms[count_algo]
-
+    algo = algor
+    
 def levels_button():  # this will set the level
     global count_level, level, block, grid
     levels = ["EASY", "INTERMEDIATE", "HARD"]
@@ -924,8 +924,7 @@ while not done:
                     width,
                     height,
                 ],
-            )
-            
+      
     # screen.fill((0, 0, 0))
     pg.display.flip()
     clock.tick(60)
