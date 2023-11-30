@@ -269,7 +269,6 @@ def greedy():
         
         if current not in visited:
             visited.add(current)
-            #count += 1
             grid[current[0]][current[1]] = 5  # Mark visited node
             print_grid(grid)  # Function to display the grid (customize as needed)
             time.sleep(0.05)  # Add a delay to make it slower
@@ -279,6 +278,7 @@ def greedy():
                 count += 1 #count the visited node
                 open_set.put((h(nei, end), nei))
                 came_from[nei] = current
+                grid[nei[0]][nei[1]] = 5
         
     answer = "There is no path to reach the endpoint."
     return False
