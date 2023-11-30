@@ -54,6 +54,7 @@ count_algo = 1
 count_level = 0
 count_map = 0
 isReset = 0
+isPlay = 0
 
 grid = [[0 for x in range(block)] for y in range(block)]
 gobalStartPoint = None
@@ -816,6 +817,7 @@ while not done:
                                 answer = "Please click the reset button"
                                 path = ""
                                 node_visit = ""
+                            isPlay = 1
                             break
                         case "MAPS":
                             isReset = 0
@@ -848,7 +850,8 @@ while not done:
                             break
                         case "RESET":
                             isReset = 0
-                            reset_button()
+                            if isPlay == 1:
+                                reset_button()
                             answer = ""
                             path = ""
                             node_visit = ""
