@@ -166,7 +166,6 @@ def bfs():
         eventHandle()
         current = open_set.get()
         visited.add(current)
-        # simulate_bfs_process(visited, current)
 
         for nei in neighbour[current[0] * len(grid[0]) + current[1]]:
             if nei not in visited:
